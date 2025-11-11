@@ -24,10 +24,16 @@ function Popup({ showPopup, setShowPopup, setUser }) {
 
       if (res.ok) {
         alert("✅ Login successful!");
-        // ✅ Store only needed info
-        setUser({ firstName: data.user.firstName, email: data.user.email });
+        // ✅ Store user with ID
+        const user = {
+          id: data.user.id,        // <-- important
+          firstName: data.user.firstName,
+          email: data.user.email,
+        };
+        setUser(user);
+        localStorage.setItem("user", JSON.stringify(user)); // persist
         setShowPopup(true);
-        navigate("/menu");
+        navigate("/");
       } else {
         alert("❌ " + data.message);
       }
@@ -87,3 +93,5 @@ function Popup({ showPopup, setShowPopup, setUser }) {
 }
 
 export default Popup;
+
+//lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
