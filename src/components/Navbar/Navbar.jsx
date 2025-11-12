@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { FaUser, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useCart } from "../../context/CartContext"; // Import the cart context
+import { useCart } from "../../context/CartContext";
 
 const NavLink = [
-  { id: 1, name: "Home", link: "#hero" },
+  { id: 1, name: "Home", link: "/" },
   { id: 2, name: "About", link: "#about" },
   { id: 3, name: "Menu", link: "/menu" },
   { id: 4, name: "Contact", link: "#contact" },
@@ -15,7 +15,7 @@ function Navbar({ HandlePopup, user, handleLogout }) {
   const [userDropdown, setUserDropdown] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { cart } = useCart(); // Get cart data from context
+  const { cart } = useCart();
 
   // Calculate total items in cart
   const totalCartItems = cart.reduce((total, item) => total + (item.quantity || 1), 0);
@@ -29,6 +29,24 @@ function Navbar({ HandlePopup, user, handleLogout }) {
     }
   };
 
+  // Check if a nav item is active
+  const isActive = (link) => {
+    if (link === "/") {
+      return location.pathname === "/";
+    }
+    if (link.startsWith("#")) {
+      // For anchor links on home page
+      return location.pathname === "/" && location.hash === link;
+    }
+    return location.pathname === link;
+  };
+
+  // Get active link name for mobile menu indicator
+  const getActiveLinkName = () => {
+    const activeLink = NavLink.find(link => isActive(link.link));
+    return activeLink ? activeLink.name : "Home";
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full bg-white z-50 shadow-md">
       <div className="container mx-auto flex justify-between items-center py-4 px-5">
@@ -37,21 +55,39 @@ function Navbar({ HandlePopup, user, handleLogout }) {
         {/* Desktop Nav */}
         <ul className="hidden md:flex items-center gap-6">
           {NavLink.map(({ id, name, link }) => (
-            <li key={id}>
+            <li key={id} className="relative">
               {name === "Menu" ? (
-                <Link to={link} className="hover:text-primary text-xl font-semibold">
+                <Link 
+                  to={link} 
+                  className={`hover:text-primary text-xl font-semibold transition duration-200 ${
+                    isActive(link) 
+                      ? "text-primary border-b-2 border-primary pb-1" 
+                      : "text-gray-700"
+                  }`}
+                >
                   {name}
                 </Link>
-              ) : location.pathname === "/" ? (
+              ) : link.startsWith("#") ? (
                 <a
                   href={link}
                   onClick={(e) => handleScroll(e, link)}
-                  className="hover:text-primary text-xl font-semibold"
+                  className={`hover:text-primary text-xl font-semibold transition duration-200 ${
+                    isActive(link) 
+                      ? "text-primary border-b-2 border-primary pb-1" 
+                      : "text-gray-700"
+                  }`}
                 >
                   {name}
                 </a>
               ) : (
-                <Link to={`/${link}`} className="hover:text-primary text-xl font-semibold">
+                <Link 
+                  to={link} 
+                  className={`hover:text-primary text-xl font-semibold transition duration-200 ${
+                    isActive(link) 
+                      ? "text-primary border-b-2 border-primary pb-1" 
+                      : "text-gray-700"
+                  }`}
+                >
                   {name}
                 </Link>
               )}
@@ -63,7 +99,11 @@ function Navbar({ HandlePopup, user, handleLogout }) {
             <li className="relative">
               <button
                 onClick={() => navigate("/cart")}
-                className="relative flex items-center gap-2 text-xl text-white bg-primary px-4 py-2 rounded-lg hover:bg-primary/90 transition duration-200"
+                className={`relative flex items-center gap-2 text-xl px-4 py-2 rounded-lg hover:bg-primary/10 transition duration-200 ${
+                  location.pathname === "/cart" 
+                    ? "text-primary border-2 border-primary" 
+                    : "text-white bg-primary hover:bg-primary/90"
+                }`}
               >
                 <FaShoppingCart />
                 {totalCartItems > 0 && (
@@ -119,6 +159,11 @@ function Navbar({ HandlePopup, user, handleLogout }) {
 
         {/* Mobile menu button */}
         <div className="md:hidden flex items-center gap-4">
+          {/* Active page indicator for mobile */}
+          <div className="text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+            {getActiveLinkName()}
+          </div>
+
           {/* Cart Icon for Mobile (visible even when menu is closed) */}
           {user && totalCartItems > 0 && (
             <button
@@ -144,32 +189,44 @@ function Navbar({ HandlePopup, user, handleLogout }) {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white shadow-lg border-t border-gray-100">
-          <ul className="flex flex-col items-start gap-4 px-5 py-6">
+          <ul className="flex flex-col items-start gap-0 px-5 py-4">
             {NavLink.map(({ id, name, link }) => (
-              <li key={id} className="w-full border-b border-gray-100 pb-3 last:border-b-0 last:pb-0">
+              <li key={id} className="w-full">
                 {name === "Menu" ? (
                   <Link
                     to={link}
-                    className="block w-full text-lg font-semibold hover:text-primary py-2 transition duration-200"
+                    className={`block w-full text-lg font-semibold py-4 px-3 transition duration-200 border-l-4 ${
+                      isActive(link)
+                        ? "text-primary bg-primary/10 border-primary"
+                        : "text-gray-700 hover:text-primary hover:bg-gray-50 border-transparent"
+                    }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {name}
                   </Link>
-                ) : location.pathname === "/" ? (
+                ) : link.startsWith("#") ? (
                   <a
                     href={link}
                     onClick={(e) => {
                       handleScroll(e, link);
                       setMobileMenuOpen(false);
                     }}
-                    className="block w-full text-lg font-semibold hover:text-primary py-2 transition duration-200"
+                    className={`block w-full text-lg font-semibold py-4 px-3 transition duration-200 border-l-4 ${
+                      isActive(link)
+                        ? "text-primary bg-primary/10 border-primary"
+                        : "text-gray-700 hover:text-primary hover:bg-gray-50 border-transparent"
+                    }`}
                   >
                     {name}
                   </a>
                 ) : (
                   <Link
-                    to={`/${link}`}
-                    className="block w-full text-lg font-semibold hover:text-primary py-2 transition duration-200"
+                    to={link}
+                    className={`block w-full text-lg font-semibold py-4 px-3 transition duration-200 border-l-4 ${
+                      isActive(link)
+                        ? "text-primary bg-primary/10 border-primary"
+                        : "text-gray-700 hover:text-primary hover:bg-gray-50 border-transparent"
+                    }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {name}
@@ -180,13 +237,17 @@ function Navbar({ HandlePopup, user, handleLogout }) {
 
             {/* Cart for Mobile */}
             {user && (
-              <li className="w-full border-b border-gray-100 pb-3">
+              <li className="w-full">
                 <button
                   onClick={() => {
                     navigate("/cart");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-between text-lg font-semibold text-primary bg-primary/10 px-4 py-3 rounded-lg hover:bg-primary/20 transition duration-200"
+                  className={`w-full flex items-center justify-between text-lg font-semibold py-4 px-3 transition duration-200 border-l-4 ${
+                    location.pathname === "/cart"
+                      ? "text-primary bg-primary/10 border-primary"
+                      : "text-primary bg-primary/10 hover:bg-primary/20 border-transparent"
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     <FaShoppingCart />
@@ -202,7 +263,7 @@ function Navbar({ HandlePopup, user, handleLogout }) {
             )}
 
             {/* User Section for Mobile */}
-            <li className="w-full pt-3 border-t border-gray-200">
+            <li className="w-full pt-4 border-t border-gray-200 mt-2">
               {user ? (
                 <div className="space-y-3">
                   <div className="bg-gray-50 rounded-lg p-4">
