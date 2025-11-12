@@ -1,9 +1,93 @@
 // components/Cart/CartPage.jsx
 import React, { useState } from "react";
 import { useCart } from "../../context/CartContext";
-import { FaTrashAlt, FaPlus, FaMinus, FaShoppingBag, FaArrowLeft, FaCreditCard } from "react-icons/fa";
+import { FaTrashAlt, FaPlus, FaMinus, FaShoppingBag, FaArrowLeft, FaCreditCard, FaUtensils, FaSmile } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
+// Empty Cart Component
+const EmptyCart = () => {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center py-20 px-4">
+      <div className="text-center max-w-md mx-auto">
+        {/* Animated Icon Container */}
+        <div className="relative mb-8">
+          <div className="w-40 h-40 mx-auto bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center shadow-2xl animate-pulse">
+            <FaShoppingBag className="text-5xl text-white" />
+          </div>
+          
+          {/* Floating elements */}
+          <div className="absolute -top-4 -right-4 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce">
+            <span className="text-2xl">🍕</span>
+          </div>
+          
+          <div className="absolute -bottom-4 -left-4 w-10 h-10 bg-green-400 rounded-full flex items-center justify-center animate-ping">
+            <span className="text-xl">🥗</span>
+          </div>
+          
+          <div className="absolute top-1/2 -right-8 w-8 h-8 bg-red-400 rounded-full animate-bounce delay-300">
+            <span className="text-lg">🍔</span>
+          </div>
+        </div>
+        
+        {/* Text Content */}
+        <h2 className="text-4xl font-bold text-gray-800 mb-4">
+          Your cart is empty
+        </h2>
+        
+        <div className="flex justify-center mb-6">
+          <FaSmile className="text-3xl text-yellow-500 animate-bounce" />
+        </div>
+        
+        <p className="text-gray-600 mb-8 text-lg leading-relaxed">
+          Looks like you haven't added any delicious items to your cart yet. 
+          Don't worry, our kitchen is ready to serve you something amazing!
+        </p>
+        
+        {/* Action Buttons */}
+        <div className="space-y-4">
+          <Link
+            to="/menu"
+            className="inline-flex items-center gap-3 bg-primary text-white px-8 py-4 rounded-xl hover:bg-primary/90 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+          >
+            <FaUtensils />
+            Explore Our Menu
+          </Link>
+          
+          {/* Features List */}
+          <div className="bg-white/80 rounded-2xl p-6 mt-8 shadow-md">
+            <h3 className="font-semibold text-gray-800 mb-4">Why order from us?</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✓</span>
+                Fresh Ingredients
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✓</span>
+                Quick Delivery
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✓</span>
+                24/7 Service
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✓</span>
+                Best Quality
+              </div>
+            </div>
+          </div>
+          
+          {/* Special Offer */}
+          <div className="mt-6 p-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl text-white">
+            <p className="font-bold text-lg">🎁 Special Offer!</p>
+            <p className="text-sm">Free delivery on your first order above ₹500</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main Cart Page Component
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, addToCart } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -47,27 +131,9 @@ const CartPage = () => {
     }, 2000);
   };
 
+  // Return Empty Cart if no items
   if (cart.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-md mx-auto text-center bg-white rounded-2xl shadow-lg p-8">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              <FaShoppingBag className="text-4xl text-gray-400" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Your cart is empty</h2>
-            <p className="text-gray-600 mb-6">Looks like you haven't added any items to your cart yet.</p>
-            <Link
-              to="/menu"
-              className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition duration-200 font-semibold"
-            >
-              <FaArrowLeft />
-              Browse Menu
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+    return <EmptyCart />;
   }
 
   return (
@@ -121,7 +187,7 @@ const CartPage = () => {
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => handleDecreaseQuantity(item)}
-                          className="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition duration-200"
+                          className="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={item.quantity <= 1}
                         >
                           <FaMinus size={12} />
