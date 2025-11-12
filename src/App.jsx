@@ -10,14 +10,13 @@ import Popup from "./components/Auth/login";
 import MenuPage from "./components/Menu/MenuPage";
 import Signup from "./components/Auth/signup";
 import CartPage from "./components/Cart/CartPage";
-import ProtectedRoute from "./components/ProtectedRoute"; 
+import ProtectedRoute from "./components/ProtectedRoute";
 import { CartProvider } from "./context/CartContext";
 
 function App() {
   const [showPopup, setShowPopup] = useState(false);
 
   const [user, setUser] = useState(() => {
-    // ✅ load user from localStorage if exists
     const saved = localStorage.getItem("user");
     return saved ? JSON.parse(saved) : null;
   });
@@ -26,7 +25,7 @@ function App() {
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem("user"); // ✅ remove persisted user
+    localStorage.removeItem("user");
     alert("Logged out successfully!");
   };
 
@@ -57,7 +56,20 @@ function App() {
                 </>
               }
             />
-            <Route path="/menu" element={<MenuPage />} />
+            {/* Pass HandlePopup to MenuPage */}
+            <Route 
+              path="/menu" 
+              element={
+                <>
+                  <MenuPage HandlePopup={HandlePopup} />
+                  <Popup
+                    showPopup={showPopup}
+                    setShowPopup={setShowPopup}
+                    setUser={setUser}
+                  />
+                </>
+              } 
+            />
             <Route path="/signup" element={<Signup />} />
             <Route 
               path="/cart" 
