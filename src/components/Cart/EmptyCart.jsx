@@ -6,7 +6,7 @@ import { FaShoppingBag, FaUtensils, FaSmile } from "react-icons/fa";
 const EmptyCart = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center py-20 px-4 w-full ">
-      <div className="text-center max-w-md mx-auto  ">
+      <div className="text-center mx-auto ">
         {/* Animated Icon Container */}
         <div className="relative mb-8">
           <div className="w-40 h-40 mx-auto bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center shadow-2xl animate-pulse">
