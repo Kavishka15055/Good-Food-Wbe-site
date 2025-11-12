@@ -13,14 +13,24 @@ const CartPage = () => {
   }, 0);
 
   const handleIncreaseQuantity = (item) => {
-    addToCart(item);
+    // Create a proper product object from the cart item
+    const product = {
+      id: item.product_id || item.id, // Use product_id from backend or id from frontend
+      name: item.name,
+      img: item.img,
+      price: item.price
+    };
+    console.log("➕ Increasing quantity for:", product);
+    addToCart(product);
   };
 
   const handleDecreaseQuantity = (item) => {
+    console.log("➖ Decreasing quantity for product ID:", item.product_id || item.id);
     removeFromCart(item.product_id || item.id);
   };
 
   const handleRemoveItem = (productId) => {
+    console.log("🗑️ Removing item with product ID:", productId);
     removeFromCart(productId);
   };
 
@@ -53,6 +63,9 @@ const CartPage = () => {
                     {item.name}
                   </h3>
                   <p className="text-gray-600 mb-2">{item.price}</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Product ID: {item.product_id || item.id}
+                  </p>
                   
                   <div className="flex items-center justify-center md:justify-start space-x-4">
                     <button
@@ -62,7 +75,7 @@ const CartPage = () => {
                       <FaMinus size={12} />
                     </button>
                     
-                    <span className="text-lg font-semibold">
+                    <span className="text-lg font-semibold min-w-8 text-center">
                       {item.quantity}
                     </span>
                     
