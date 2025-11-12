@@ -1,15 +1,28 @@
+// components/Cart/CartPage.jsx
 import React from "react";
 import { useCart } from "../../context/CartContext";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt, FaPlus, FaMinus } from "react-icons/fa";
 
 const CartPage = () => {
-  const { cart, removeFromCart, clearCart } = useCart();
+  const { cart, removeFromCart, clearCart, addToCart } = useCart();
 
   const totalPrice = cart.reduce((acc, item) => {
     const cleaned = (item.price || "").replace(/[^\d.-]/g, "");
     const price = parseFloat(cleaned) || 0;
-    return acc + price;
+    return acc + (price * item.quantity);
   }, 0);
+
+  const handleIncreaseQuantity = (item) => {
+    addToCart(item);
+  };
+
+  const handleDecreaseQuantity = (item) => {
+    removeFromCart(item.product_id || item.id);
+  };
+
+  const handleRemoveItem = (productId) => {
+    removeFromCart(productId);
+  };
 
   return (
     <div className="container mx-auto py-20 px-5">
@@ -23,28 +36,52 @@ const CartPage = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             {cart.map((item, index) => (
               <div
                 key={index}
-                className="relative shadow-lg rounded-xl overflow-hidden bg-white hover:shadow-xl transition-shadow duration-300"
+                className="flex flex-col md:flex-row items-center bg-white shadow-lg rounded-xl p-4 hover:shadow-xl transition-shadow duration-300"
               >
                 <img
                   src={item.img}
                   alt={item.name}
-                  className="w-full h-48 object-cover"
+                  className="w-full md:w-48 h-48 object-cover rounded-lg mb-4 md:mb-0"
                 />
-                <div className="p-5 text-center">
+                
+                <div className="flex-1 md:ml-6 text-center md:text-left">
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">
                     {item.name}
                   </h3>
-                  <p className="text-gray-600 mb-4">{item.price}</p>
+                  <p className="text-gray-600 mb-2">{item.price}</p>
+                  
+                  <div className="flex items-center justify-center md:justify-start space-x-4">
+                    <button
+                      onClick={() => handleDecreaseQuantity(item)}
+                      className="bg-gray-200 text-gray-700 p-2 rounded-full hover:bg-gray-300 transition duration-200"
+                    >
+                      <FaMinus size={12} />
+                    </button>
+                    
+                    <span className="text-lg font-semibold">
+                      {item.quantity}
+                    </span>
+                    
+                    <button
+                      onClick={() => handleIncreaseQuantity(item)}
+                      className="bg-gray-200 text-gray-700 p-2 rounded-full hover:bg-gray-300 transition duration-200"
+                    >
+                      <FaPlus size={12} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-4 md:mt-0">
                   <button
-  onClick={() => removeFromCart(item.id)} // ✅ use item.id instead of item.name
-  className="flex items-center justify-center gap-2 bg-red-500 text-white px-5 py-2 rounded hover:bg-red-600 transition duration-200 mx-auto"
->
-  <FaTrashAlt /> Remove
-</button>
+                    onClick={() => handleRemoveItem(item.product_id || item.id)}
+                    className="flex items-center justify-center gap-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
+                  >
+                    <FaTrashAlt /> Remove
+                  </button>
                 </div>
               </div>
             ))}
