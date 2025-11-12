@@ -44,36 +44,60 @@ export const CartProvider = ({ children, user }) => {
       return;
     }
 
+    // Extract the actual product ID (handle both product objects and cart items)
+    const productId = item.product_id || item.id;
+    
+    if (!productId) {
+      console.error("❌ No product ID found in item:", item);
+      alert("❌ Error: Invalid product");
+      return;
+    }
+
     try {
-      console.log("🛒 Sending request to backend...");
+      console.log("🛒 Sending request to backend for product ID:", productId);
       const res = await fetch("http://localhost:5000/api/cart/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: user.id,
-          productId: item.id,
+          productId: productId,
         }),
       });
 
       console.log("🛒 Backend response status:", res.status);
       
-      const data = await res.json();
+      // Handle HTML error responses (like 500 errors that return HTML)
+      const contentType = res.headers.get("content-type");
+      let data;
+      
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        console.error("❌ Server returned non-JSON response:", text.substring(0, 200));
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
+      }
+
       console.log("🛒 Backend response data:", data);
 
       if (res.ok && data.success) {
         // Update local cart state
         setCart(prevCart => {
-          const existingItem = prevCart.find(cartItem => cartItem.product_id === item.id);
+          const existingItem = prevCart.find(cartItem => 
+            cartItem.product_id === productId || cartItem.id === productId
+          );
+          
           if (existingItem) {
             return prevCart.map(cartItem =>
-              cartItem.product_id === item.id
+              (cartItem.product_id === productId || cartItem.id === productId)
                 ? { ...cartItem, quantity: cartItem.quantity + 1 }
                 : cartItem
             );
           } else {
+            // This shouldn't happen often since backend should sync, but handle it
             return [...prevCart, {
               id: Date.now(),
-              product_id: item.id,
+              product_id: productId,
               name: item.name,
               img: item.img,
               price: item.price,
@@ -81,18 +105,20 @@ export const CartProvider = ({ children, user }) => {
             }];
           }
         });
-        alert("✅ Item added to cart!");
+        console.log("✅ Item added to cart!");
       } else {
         alert(`❌ Failed to add item: ${data.message}`);
       }
     } catch (err) {
-      console.error("❌ Network error adding to cart:", err);
-      alert("❌ Network error adding item to cart");
+      console.error("❌ Error adding to cart:", err);
+      alert("❌ Error adding item to cart: " + err.message);
     }
   };
 
   const removeFromCart = async (productId) => {
     if (!user) return;
+
+    console.log("🛒 Removing item with ID:", productId);
 
     try {
       const res = await fetch("http://localhost:5000/api/cart/remove", {
@@ -104,26 +130,43 @@ export const CartProvider = ({ children, user }) => {
         }),
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get("content-type");
+      let data;
+      
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        console.error("❌ Server returned non-JSON response:", text.substring(0, 200));
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
+      }
+
       console.log("🛒 Remove response:", data);
 
       if (res.ok && data.success) {
         setCart(prevCart => {
-          const existingItem = prevCart.find(item => item.product_id === productId);
+          const existingItem = prevCart.find(item => 
+            item.product_id === productId || item.id === productId
+          );
+          
           if (existingItem && existingItem.quantity > 1) {
             return prevCart.map(item =>
-              item.product_id === productId
+              (item.product_id === productId || item.id === productId)
                 ? { ...item, quantity: item.quantity - 1 }
                 : item
             );
           } else {
-            return prevCart.filter(item => item.product_id !== productId);
+            return prevCart.filter(item => 
+              !(item.product_id === productId || item.id === productId)
+            );
           }
         });
+      } else {
+        alert(`❌ Failed to remove item: ${data.message}`);
       }
     } catch (err) {
       console.error("❌ Error removing from cart:", err);
-      alert("❌ Error removing item from cart");
+      alert("❌ Error removing item from cart: " + err.message);
     }
   };
 
@@ -137,16 +180,28 @@ export const CartProvider = ({ children, user }) => {
         body: JSON.stringify({ userId: user.id }),
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get("content-type");
+      let data;
+      
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        console.error("❌ Server returned non-JSON response:", text.substring(0, 200));
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
+      }
+
       console.log("🛒 Clear cart response:", data);
 
       if (res.ok && data.success) {
         setCart([]);
         alert("✅ Cart cleared!");
+      } else {
+        alert(`❌ Failed to clear cart: ${data.message}`);
       }
     } catch (err) {
       console.error("❌ Error clearing cart:", err);
-      alert("❌ Error clearing cart");
+      alert("❌ Error clearing cart: " + err.message);
     }
   };
 
