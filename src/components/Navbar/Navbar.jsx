@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaUser, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 
 const NavLink = [
-  { id: 1, name: "Home", link: "/" },
-  { id: 2, name: "About", link: "#about" },
+  { id: 1, name: "Home", link: "/#hero" }, // Changed to include both route and hash
+  { id: 2, name: "About", link: "/#about" },
   { id: 3, name: "Menu", link: "/menu" },
-  { id: 4, name: "Contact", link: "#contact" },
+  { id: 4, name: "Contact", link: "/#contact" },
 ];
 
 function Navbar({ HandlePopup, user, handleLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
+  const [activeSection, setActiveSection] = useState("hero");
   const location = useLocation();
   const navigate = useNavigate();
   const { cart } = useCart();
@@ -20,29 +21,98 @@ function Navbar({ HandlePopup, user, handleLogout }) {
   // Calculate total items in cart
   const totalCartItems = cart.reduce((total, item) => total + (item.quantity || 1), 0);
 
-  const handleScroll = (e, link) => {
-    e.preventDefault();
-    const target = document.querySelector(link);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
-      setMobileMenuOpen(false);
+  // Scroll spy to detect which section is in view (only on home page)
+  useEffect(() => {
+    if (location.pathname === "/") {
+      const handleScroll = () => {
+        const sections = ['hero', 'about', 'contact'];
+        const scrollY = window.scrollY + 200; // Offset for navbar height
+
+        for (const section of sections) {
+          const element = document.getElementById(section);
+          if (element) {
+            const { offsetTop, offsetHeight } = element;
+            if (scrollY >= offsetTop && scrollY < offsetTop + offsetHeight) {
+              setActiveSection(section);
+              break;
+            }
+          }
+        }
+      };
+
+      window.addEventListener('scroll', handleScroll);
+      // Initial check
+      handleScroll();
+
+      return () => window.removeEventListener('scroll', handleScroll);
+    } else {
+      // Reset active section when not on home page
+      setActiveSection("");
     }
+  }, [location.pathname]);
+
+  // Handle navigation for home page sections
+  const handleNavigation = (e, link) => {
+    e.preventDefault();
+    
+    if (link === "/menu") {
+      navigate("/menu");
+      setMobileMenuOpen(false);
+      return;
+    }
+
+    // If link contains both route and hash (like "/#about")
+    if (link.includes('#')) {
+      const [route, hash] = link.split('#');
+      const targetId = hash;
+      
+      if (location.pathname === route) {
+        // Already on home page, just scroll to section
+        const target = document.getElementById(targetId);
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth" });
+          setActiveSection(targetId);
+        }
+      } else {
+        // Navigate to home page first, then scroll to section
+        navigate(route);
+        // Use setTimeout to wait for navigation to complete
+        setTimeout(() => {
+          const target = document.getElementById(targetId);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth" });
+            setActiveSection(targetId);
+          }
+        }, 100);
+      }
+    } else {
+      // Regular route navigation
+      navigate(link);
+    }
+    
+    setMobileMenuOpen(false);
   };
 
   // Check if a nav item is active
   const isActive = (link) => {
-    if (link === "/") {
-      return location.pathname === "/";
+    if (link === "/menu") {
+      return location.pathname === "/menu";
     }
-    if (link.startsWith("#")) {
-      // For anchor links on home page
-      return location.pathname === "/" && location.hash === link;
+    
+    if (link.startsWith("/#")) {
+      const sectionId = link.split('#')[1];
+      // For home page sections
+      return location.pathname === "/" && activeSection === sectionId;
     }
+    
     return location.pathname === link;
   };
 
   // Get active link name for mobile menu indicator
   const getActiveLinkName = () => {
+    if (location.pathname === "/menu") return "Menu";
+    if (location.pathname === "/cart") return "Cart";
+    
     const activeLink = NavLink.find(link => isActive(link.link));
     return activeLink ? activeLink.name : "Home";
   };
@@ -56,41 +126,16 @@ function Navbar({ HandlePopup, user, handleLogout }) {
         <ul className="hidden md:flex items-center gap-6">
           {NavLink.map(({ id, name, link }) => (
             <li key={id} className="relative">
-              {name === "Menu" ? (
-                <Link 
-                  to={link} 
-                  className={`hover:text-primary text-xl font-semibold transition duration-200 ${
-                    isActive(link) 
-                      ? "text-primary border-b-2 border-primary pb-1" 
-                      : "text-gray-700"
-                  }`}
-                >
-                  {name}
-                </Link>
-              ) : link.startsWith("#") ? (
-                <a
-                  href={link}
-                  onClick={(e) => handleScroll(e, link)}
-                  className={`hover:text-primary text-xl font-semibold transition duration-200 ${
-                    isActive(link) 
-                      ? "text-primary border-b-2 border-primary pb-1" 
-                      : "text-gray-700"
-                  }`}
-                >
-                  {name}
-                </a>
-              ) : (
-                <Link 
-                  to={link} 
-                  className={`hover:text-primary text-xl font-semibold transition duration-200 ${
-                    isActive(link) 
-                      ? "text-primary border-b-2 border-primary pb-1" 
-                      : "text-gray-700"
-                  }`}
-                >
-                  {name}
-                </Link>
-              )}
+              <button
+                onClick={(e) => handleNavigation(e, link)}
+                className={`hover:text-primary text-xl font-semibold transition duration-200 ${
+                  isActive(link) 
+                    ? "text-primary border-b-2 border-primary pb-1" 
+                    : "text-gray-700"
+                }`}
+              >
+                {name}
+              </button>
             </li>
           ))}
 
@@ -192,46 +237,16 @@ function Navbar({ HandlePopup, user, handleLogout }) {
           <ul className="flex flex-col items-start gap-0 px-5 py-4">
             {NavLink.map(({ id, name, link }) => (
               <li key={id} className="w-full">
-                {name === "Menu" ? (
-                  <Link
-                    to={link}
-                    className={`block w-full text-lg font-semibold py-4 px-3 transition duration-200 border-l-4 ${
-                      isActive(link)
-                        ? "text-primary bg-primary/10 border-primary"
-                        : "text-gray-700 hover:text-primary hover:bg-gray-50 border-transparent"
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {name}
-                  </Link>
-                ) : link.startsWith("#") ? (
-                  <a
-                    href={link}
-                    onClick={(e) => {
-                      handleScroll(e, link);
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`block w-full text-lg font-semibold py-4 px-3 transition duration-200 border-l-4 ${
-                      isActive(link)
-                        ? "text-primary bg-primary/10 border-primary"
-                        : "text-gray-700 hover:text-primary hover:bg-gray-50 border-transparent"
-                    }`}
-                  >
-                    {name}
-                  </a>
-                ) : (
-                  <Link
-                    to={link}
-                    className={`block w-full text-lg font-semibold py-4 px-3 transition duration-200 border-l-4 ${
-                      isActive(link)
-                        ? "text-primary bg-primary/10 border-primary"
-                        : "text-gray-700 hover:text-primary hover:bg-gray-50 border-transparent"
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {name}
-                  </Link>
-                )}
+                <button
+                  onClick={(e) => handleNavigation(e, link)}
+                  className={`block w-full text-left text-lg font-semibold py-4 px-3 transition duration-200 border-l-4 ${
+                    isActive(link)
+                      ? "text-primary bg-primary/10 border-primary"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50 border-transparent"
+                  }`}
+                >
+                  {name}
+                </button>
               </li>
             ))}
 
