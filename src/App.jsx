@@ -10,10 +10,11 @@ import Popup from "./components/Auth/login";
 import MenuPage from "./components/Menu/MenuPage";
 import Signup from "./components/Auth/signup";
 import CartPage from "./components/Cart/CartPage";
+import ProtectedRoute from "./components/ProtectedRoute"; 
 import { CartProvider } from "./context/CartContext";
 
 function App() {
-  const [showPopup, setShowPopup] = useState(false); // ✅ showPopup false initially
+  const [showPopup, setShowPopup] = useState(false);
 
   const [user, setUser] = useState(() => {
     // ✅ load user from localStorage if exists
@@ -58,7 +59,14 @@ function App() {
             />
             <Route path="/menu" element={<MenuPage />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/cart" element={<CartPage />} />
+            <Route 
+              path="/cart" 
+              element={
+                <ProtectedRoute>
+                  <CartPage />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </div>
       </Router>
