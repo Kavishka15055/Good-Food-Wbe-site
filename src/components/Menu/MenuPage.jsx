@@ -1,4 +1,4 @@
-// src/pages/MenuPage.jsx
+// components/Menu/MenuPage.jsx
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
@@ -7,13 +7,12 @@ const MenuPage = () => {
   const location = useLocation();
   const { addToCart } = useCart();
 
-  // ✅ Menu categories (ensure IDs match your backend products table)
   const menuCategories = [
     {
       id: "starters",
       title: "Starters / Appetizers",
       items: [
-        { id: 1, name: "Spring Rolls", img: "/images/menu/starters/spring-rolls.jpg", price: "450.Rs" },
+        { id: 1, name: "Spring Rolls", img: "/images/menu/starters/spring-rolls.jpg", price: "550.Rs" },
         { id: 2, name: "Garlic Bread", img: "/images/menu/starters/garlic-bread.jpg", price: "450.Rs" },
         { id: 3, name: "Bruschetta", img: "/images/menu/starters/Bruschetta.jpg", price: "450.Rs" },
         { id: 4, name: "Chicken Wings", img: "/images/menu/starters/Chicken-Wings.jpg", price: "450.Rs" },
@@ -61,7 +60,6 @@ const MenuPage = () => {
     },
   ];
 
-  // ✅ Scroll to section if hash in URL
   useEffect(() => {
     if (location.hash) {
       const section = document.querySelector(location.hash);
@@ -71,9 +69,8 @@ const MenuPage = () => {
     }
   }, [location]);
 
-  // ✅ Handle add to cart using CartContext
   const handleAddToCart = (item) => {
-    addToCart(item); // CartContext now handles login check
+    addToCart(item);
   };
 
   return (
@@ -88,7 +85,7 @@ const MenuPage = () => {
             {category.items.map((item) => (
               <div
                 key={item.id}
-                className="relative pb-3 shadow-lg rounded-2xl hover:shadow-xl hover:scale-110 transition-all duration-700 ease-in-out flex flex-col items-center justify-end bg-cover bg-center h-94 w-full text-white overflow-hidden"
+                className="relative pb-3 shadow-lg rounded-2xl hover:shadow-xl hover:scale-105 transition-all duration-300 ease-in-out flex flex-col items-center justify-end bg-cover bg-center h-94 w-full text-white overflow-hidden"
                 style={{ backgroundImage: `url(${item.img})` }}
               >
                 <div className="absolute bottom-0 left-0 right-0 h-2/5 rounded-b-2xl overflow-hidden">
@@ -101,7 +98,7 @@ const MenuPage = () => {
 
                   <button
                     onClick={() => handleAddToCart(item)}
-                    className="bg-primary text-white px-10 py-2 rounded-md hover:bg-primary/80 transition"
+                    className="bg-primary text-white px-10 py-2 rounded-md hover:bg-primary/80 transition duration-200"
                   >
                     Add to Cart
                   </button>
@@ -116,7 +113,3 @@ const MenuPage = () => {
 };
 
 export default MenuPage;
-
-
-//lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-
