@@ -1,79 +1,134 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+// context/CartContext.jsx
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-// Create context
 const CartContext = createContext();
-export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children, user }) => {
   const [cart, setCart] = useState([]);
 
-  // Function to fetch cart
-  const fetchCart = async () => {
-    if (!user?.id) {
+  // Load cart from backend when user logs in
+  useEffect(() => {
+    if (user?.id) {
+      console.log("👤 User logged in, fetching cart for user ID:", user.id);
+      fetchCartFromBackend();
+    } else {
+      console.log("👤 No user, clearing cart");
       setCart([]);
+    }
+  }, [user]);
+
+  const fetchCartFromBackend = async () => {
+    try {
+      console.log("🛒 Fetching cart from backend...");
+      const res = await fetch(`http://localhost:5000/api/cart/${user.id}`);
+      console.log("🛒 Backend response status:", res.status);
+      
+      if (res.ok) {
+        const cartData = await res.json();
+        console.log("🛒 Cart data received:", cartData);
+        setCart(cartData);
+      } else {
+        const errorData = await res.json();
+        console.error("❌ Error fetching cart:", errorData);
+      }
+    } catch (err) {
+      console.error("❌ Network error fetching cart:", err);
+    }
+  };
+
+  const addToCart = async (item) => {
+    console.log("🛒 Add to cart clicked for item:", item);
+    
+    if (!user) {
+      alert("Please login to add items to cart");
       return;
     }
 
     try {
-      console.log("Fetching cart for user:", user.id);
-      const res = await fetch(`http://localhost:5000/api/cart/${user.id}`);
-      if (!res.ok) throw new Error("Failed to fetch cart");
-      const data = await res.json();
-      setCart(data);
-    } catch (err) {
-      console.error("Error fetching cart:", err);
-    }
-  };
-
-  // Fetch cart when user changes
-  useEffect(() => {
-    fetchCart();
-  }, [user]);
-
-  // Add product to cart
-  const addToCart = async (product) => {
-    if (!user?.id) return alert("Please log in to add items to your cart");
-    if (!product) return alert("Product is invalid");
-
-    try {
+      console.log("🛒 Sending request to backend...");
       const res = await fetch("http://localhost:5000/api/cart/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id, product }),
+        body: JSON.stringify({
+          userId: user.id,
+          productId: item.id,
+        }),
       });
 
-      if (!res.ok) throw new Error("Failed to add to cart");
+      console.log("🛒 Backend response status:", res.status);
+      
+      const data = await res.json();
+      console.log("🛒 Backend response data:", data);
 
-      // Refresh cart
-      await fetchCart();
+      if (res.ok && data.success) {
+        // Update local cart state
+        setCart(prevCart => {
+          const existingItem = prevCart.find(cartItem => cartItem.product_id === item.id);
+          if (existingItem) {
+            return prevCart.map(cartItem =>
+              cartItem.product_id === item.id
+                ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                : cartItem
+            );
+          } else {
+            return [...prevCart, {
+              id: Date.now(),
+              product_id: item.id,
+              name: item.name,
+              img: item.img,
+              price: item.price,
+              quantity: 1
+            }];
+          }
+        });
+        alert("✅ Item added to cart!");
+      } else {
+        alert(`❌ Failed to add item: ${data.message}`);
+      }
     } catch (err) {
-      console.error("Error adding to cart:", err);
+      console.error("❌ Network error adding to cart:", err);
+      alert("❌ Network error adding item to cart");
     }
   };
 
-  // Remove product from cart
   const removeFromCart = async (productId) => {
-    if (!user?.id) return alert("Please log in to remove items from your cart");
+    if (!user) return;
 
     try {
       const res = await fetch("http://localhost:5000/api/cart/remove", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id, productId }),
+        body: JSON.stringify({
+          userId: user.id,
+          productId: productId,
+        }),
       });
 
-      if (!res.ok) throw new Error("Failed to remove from cart");
+      const data = await res.json();
+      console.log("🛒 Remove response:", data);
 
-      // Refresh cart
-      await fetchCart();
+      if (res.ok && data.success) {
+        setCart(prevCart => {
+          const existingItem = prevCart.find(item => item.product_id === productId);
+          if (existingItem && existingItem.quantity > 1) {
+            return prevCart.map(item =>
+              item.product_id === productId
+                ? { ...item, quantity: item.quantity - 1 }
+                : item
+            );
+          } else {
+            return prevCart.filter(item => item.product_id !== productId);
+          }
+        });
+      }
     } catch (err) {
-      console.error("Error removing from cart:", err);
+      console.error("❌ Error removing from cart:", err);
+      alert("❌ Error removing item from cart");
     }
   };
 
-  // Clear entire cart
   const clearCart = async () => {
-    if (!user?.id) return alert("Please log in to clear your cart");
+    if (!user) return;
 
     try {
       const res = await fetch("http://localhost:5000/api/cart/clear", {
@@ -82,11 +137,16 @@ export const CartProvider = ({ children, user }) => {
         body: JSON.stringify({ userId: user.id }),
       });
 
-      if (!res.ok) throw new Error("Failed to clear cart");
+      const data = await res.json();
+      console.log("🛒 Clear cart response:", data);
 
-      setCart([]);
+      if (res.ok && data.success) {
+        setCart([]);
+        alert("✅ Cart cleared!");
+      }
     } catch (err) {
-      console.error("Error clearing cart:", err);
+      console.error("❌ Error clearing cart:", err);
+      alert("❌ Error clearing cart");
     }
   };
 
@@ -95,4 +155,12 @@ export const CartProvider = ({ children, user }) => {
       {children}
     </CartContext.Provider>
   );
+};
+
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
 };
