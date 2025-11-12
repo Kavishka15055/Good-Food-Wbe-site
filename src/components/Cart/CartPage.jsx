@@ -54,10 +54,10 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full py-20">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 w-full py-0 pb-10 ">
+      <div className="container mx-auto px-2 ">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 bg-amber-300 pt-4 pb-4 mx-[-80px] sm:mx-[-110px] sm:h-[150px] h-[120px]">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Your Cart</h1>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
             <span className="flex items-center gap-2">
@@ -69,10 +69,10 @@ const CartPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 ">
           {/* Cart Items */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="lg:col-span-2 ">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden ">
               <div className="p-6 border-b border-gray-100">
                 <h2 className="text-xl font-semibold text-gray-800">Order Summary</h2>
               </div>

@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 
 const NavLink = [
-  { id: 1, name: "Home", link: "/#hero" }, // Changed to include both route and hash
+  { id: 1, name: "Home", link: "/#hero" },
   { id: 2, name: "About", link: "/#about" },
   { id: 3, name: "Menu", link: "/menu" },
   { id: 4, name: "Contact", link: "/#contact" },
@@ -25,15 +25,21 @@ function Navbar({ HandlePopup, user, handleLogout }) {
   useEffect(() => {
     if (location.pathname === "/") {
       const handleScroll = () => {
-        const sections = ['hero', 'about', 'contact'];
-        const scrollY = window.scrollY + 200; // Offset for navbar height
+        const sections = [
+          { id: 'hero', offset: 200 },
+          { id: 'about', offset: 200 },
+          { id: 'contact', offset: 600 } // 500px offset for contact section only
+        ];
+        const scrollY = window.scrollY;
 
         for (const section of sections) {
-          const element = document.getElementById(section);
+          const element = document.getElementById(section.id);
           if (element) {
             const { offsetTop, offsetHeight } = element;
-            if (scrollY >= offsetTop && scrollY < offsetTop + offsetHeight) {
-              setActiveSection(section);
+            const adjustedOffsetTop = offsetTop - section.offset;
+            
+            if (scrollY >= adjustedOffsetTop && scrollY < adjustedOffsetTop + offsetHeight) {
+              setActiveSection(section.id);
               break;
             }
           }
@@ -66,21 +72,38 @@ function Navbar({ HandlePopup, user, handleLogout }) {
       const [route, hash] = link.split('#');
       const targetId = hash;
       
+      // Define different offsets for different sections
+      const sectionOffsets = {
+        'hero': 200,
+        'about': 200,
+        'contact': 500
+      };
+      
+      const offset = sectionOffsets[targetId] || 200; // Default to 200 if not found
+      
       if (location.pathname === route) {
-        // Already on home page, just scroll to section
+        // Already on home page, just scroll to section with offset
         const target = document.getElementById(targetId);
         if (target) {
-          target.scrollIntoView({ behavior: "smooth" });
+          const targetPosition = target.offsetTop - offset;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: "smooth"
+          });
           setActiveSection(targetId);
         }
       } else {
-        // Navigate to home page first, then scroll to section
+        // Navigate to home page first, then scroll to section with offset
         navigate(route);
         // Use setTimeout to wait for navigation to complete
         setTimeout(() => {
           const target = document.getElementById(targetId);
           if (target) {
-            target.scrollIntoView({ behavior: "smooth" });
+            const targetPosition = target.offsetTop - offset;
+            window.scrollTo({
+              top: targetPosition,
+              behavior: "smooth"
+            });
             setActiveSection(targetId);
           }
         }, 100);

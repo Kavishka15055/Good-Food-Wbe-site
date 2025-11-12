@@ -74,7 +74,7 @@ const MenuPage = () => {
   };
 
   return (
-    <div className="container mx-auto py-10 px-1">
+    <div className="container mx-auto py-10 sm:px-10 px-5  ">
       {menuCategories.map((category, index) => (
         <section key={category.id} id={category.id} className={index === 0 ? "py-0" : "py-15"}>
           <h2 className="text-3xl font-bold mb-8 text-primary border-b-4 pb-2">
