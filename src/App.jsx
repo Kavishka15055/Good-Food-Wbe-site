@@ -12,6 +12,8 @@ import Signup from "./components/Auth/signup";
 import CartPage from "./components/Cart/CartPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { CartProvider } from "./context/CartContext";
+import ProfilePage from "./components/Profile/ProfilePage";
+
 
 function App() {
   const [showPopup, setShowPopup] = useState(false);
@@ -57,8 +59,8 @@ function App() {
               }
             />
             {/* Pass HandlePopup to MenuPage */}
-            <Route 
-              path="/menu" 
+            <Route
+              path="/menu"
               element={
                 <>
                   <MenuPage HandlePopup={HandlePopup} />
@@ -68,16 +70,24 @@ function App() {
                     setUser={setUser}
                   />
                 </>
-              } 
+              }
             />
             <Route path="/signup" element={<Signup />} />
-            <Route 
-              path="/cart" 
+            <Route
+              path="/cart"
               element={
                 <ProtectedRoute>
                   <CartPage />
                 </ProtectedRoute>
-              } 
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
             />
           </Routes>
         </div>

@@ -28,7 +28,7 @@ function Navbar({ HandlePopup, user, handleLogout }) {
         const sections = [
           { id: 'hero', offset: 200 },
           { id: 'about', offset: 200 },
-          { id: 'contact', offset: 600 } // 500px offset for contact section only
+          { id: 'contact', offset: 600 }
         ];
         const scrollY = window.scrollY;
 
@@ -135,6 +135,7 @@ function Navbar({ HandlePopup, user, handleLogout }) {
   const getActiveLinkName = () => {
     if (location.pathname === "/menu") return "Menu";
     if (location.pathname === "/cart") return "Cart";
+    if (location.pathname === "/profile") return "Profile";
     
     const activeLink = NavLink.find(link => isActive(link.link));
     return activeLink ? activeLink.name : "Home";
@@ -196,11 +197,20 @@ function Navbar({ HandlePopup, user, handleLogout }) {
                   {user.firstName}
                 </button>
                 {userDropdown && (
-                  <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md w-40 border border-gray-100 overflow-hidden">
+                  <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md w-48 border border-gray-100 overflow-hidden">
                     <div className="px-4 py-2 border-b border-gray-100 bg-gray-50">
                       <p className="text-sm font-semibold text-gray-800">{user.firstName}</p>
                       <p className="text-xs text-gray-600">{user.email}</p>
                     </div>
+                    <button
+                      onClick={() => {
+                        navigate("/profile");
+                        setUserDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-3 hover:bg-gray-100 text-gray-700 font-medium transition duration-200 border-b border-gray-100"
+                    >
+                      My Profile
+                    </button>
                     <button
                       onClick={() => {
                         handleLogout();
@@ -296,6 +306,28 @@ function Navbar({ HandlePopup, user, handleLogout }) {
                       {totalCartItems}
                     </span>
                   )}
+                </button>
+              </li>
+            )}
+
+            {/* Profile for Mobile */}
+            {user && (
+              <li className="w-full">
+                <button
+                  onClick={() => {
+                    navigate("/profile");
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between text-lg font-semibold py-4 px-3 transition duration-200 border-l-4 ${
+                    location.pathname === "/profile"
+                      ? "text-primary bg-primary/10 border-primary"
+                      : "text-primary bg-primary/10 hover:bg-primary/20 border-transparent"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <FaUser />
+                    <span>My Profile</span>
+                  </div>
                 </button>
               </li>
             )}
