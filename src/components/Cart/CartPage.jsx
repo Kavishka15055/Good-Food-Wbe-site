@@ -4,6 +4,7 @@ import { useCart } from "../../context/CartContext";
 import { FaTrashAlt, FaPlus, FaMinus, FaArrowLeft, FaCreditCard } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import EmptyCart from "./EmptyCart"; // Import the EmptyCart component
+import CartBG from "../../assets/cartBG.png";
 
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, addToCart } = useCart();
@@ -57,7 +58,10 @@ const CartPage = () => {
     <div className="min-h-screen bg-gray-50 w-full py-0 pb-10 ">
       <div className="container mx-auto px-2 ">
         {/* Header */}
-        <div className="text-center mb-12 bg-amber-300 pt-4 pb-4 mx-[-80px] sm:mx-[-110px] sm:h-[150px] h-[120px]">
+        <div
+  className="text-center bg-blue-100 mb-12 pt-4 pb-4 mx-[-80px] sm:mx-[-130px] sm:h-[150px] h-[120px] bg-cover bg-center"
+  style={{ backgroundImage: `url(${CartBG})` }}
+>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Your Cart</h1>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
             <span className="flex items-center gap-2">
