@@ -13,7 +13,8 @@ import CartPage from "./components/Cart/CartPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { CartProvider } from "./context/CartContext";
 import ProfilePage from "./components/Profile/ProfilePage";
-
+import OrdersPage from "./components/Orders/OrdersPage";
+import CheckoutPage from "./components/Checkout/CheckoutPage";
 
 function App() {
   const [showPopup, setShowPopup] = useState(false);
@@ -86,6 +87,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <OrdersPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <CheckoutPage />
                 </ProtectedRoute>
               }
             />

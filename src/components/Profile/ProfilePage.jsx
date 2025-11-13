@@ -1,13 +1,18 @@
 // components/Profile/ProfilePage.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUser, FaMapMarkerAlt, FaSave, FaArrowLeft } from "react-icons/fa";
+import { FaUser, FaMapMarkerAlt, FaSave, FaArrowLeft, FaShoppingBag } from "react-icons/fa";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [userStats, setUserStats] = useState({
+    orderCount: 0,
+    totalSpent: 0,
+    memberSince: new Date().toISOString()
+  });
   const navigate = useNavigate();
 
   // Form state
@@ -24,9 +29,9 @@ const ProfilePage = () => {
     country: "Sri Lanka"
   });
 
-  // Fetch user profile
+  // Fetch user profile and statistics
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchUserData = async () => {
       try {
         const currentUser = JSON.parse(localStorage.getItem("user"));
         if (!currentUser) {
@@ -34,9 +39,12 @@ const ProfilePage = () => {
           return;
         }
 
-        const res = await fetch(`http://localhost:5000/api/profile/${currentUser.id}`);
-        if (res.ok) {
-          const userData = await res.json();
+        console.log("🔄 Fetching data for user ID:", currentUser.id);
+
+        // Fetch profile data
+        const profileRes = await fetch(`http://localhost:5000/api/profile/${currentUser.id}`);
+        if (profileRes.ok) {
+          const userData = await profileRes.json();
           setUser(userData);
           setFormData({
             firstName: userData.firstName || "",
@@ -51,7 +59,44 @@ const ProfilePage = () => {
             country: userData.country || "Sri Lanka"
           });
         } else {
+          console.error("Profile fetch failed:", profileRes.status);
           setMessage("Failed to load profile");
+        }
+
+        // Fetch user statistics - with better error handling
+        try {
+          const statsRes = await fetch(`http://localhost:5000/api/profile/${currentUser.id}/stats`);
+          console.log("Stats response status:", statsRes.status);
+          
+          if (statsRes.ok) {
+            const statsData = await statsRes.json();
+            console.log("Stats data received:", statsData); // Debug log
+            
+            // Convert totalSpent to number and ensure it's a valid number
+            const totalSpent = parseFloat(statsData.stats.totalSpent) || 0;
+            const orderCount = parseInt(statsData.stats.orderCount) || 0;
+            
+            setUserStats({
+              orderCount: orderCount,
+              totalSpent: totalSpent,
+              memberSince: statsData.stats.memberSince || new Date().toISOString()
+            });
+          } else {
+            console.warn("Stats endpoint not available, using default values");
+            // Use default values if stats endpoint fails
+            setUserStats({
+              orderCount: 0,
+              totalSpent: 0,
+              memberSince: user?.created_at || new Date().toISOString()
+            });
+          }
+        } catch (statsError) {
+          console.warn("Stats fetch failed, using defaults:", statsError);
+          setUserStats({
+            orderCount: 0,
+            totalSpent: 0,
+            memberSince: user?.created_at || new Date().toISOString()
+          });
         }
       } catch (err) {
         console.error("Error fetching profile:", err);
@@ -61,7 +106,7 @@ const ProfilePage = () => {
       }
     };
 
-    fetchUserProfile();
+    fetchUserData();
   }, [navigate]);
 
   const handleInputChange = (e) => {
@@ -104,6 +149,13 @@ const ProfilePage = () => {
     }
   };
 
+  // Safe number formatting function
+  const formatCurrency = (amount) => {
+    const num = parseFloat(amount);
+    if (isNaN(num)) return "Rs 0.00";
+    return `Rs ${num.toFixed(2)}`;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -116,10 +168,10 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen  pt-10 pb-5 w-full">
+    <div className="min-h-screen pt-10 pb-5 w-full">
       <div className="container mx-auto px-4 w-full">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 ">
+        <div className="flex items-center justify-between mb-8">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-primary hover:text-primary/80 transition duration-200"
@@ -128,7 +180,7 @@ const ProfilePage = () => {
             Back
           </button>
           <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-          <div className="w-20"></div> {/* Spacer for alignment  */}
+          <div className="w-20"></div>
         </div>
 
         {message && (
@@ -342,11 +394,17 @@ const ProfilePage = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Member since</span>
-                  <span className="font-medium">{new Date().getFullYear()}</span>
+                  <span className="font-medium">
+                    {new Date(userStats.memberSince).getFullYear()}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Orders</span>
-                  <span className="font-medium">0</span>
+                  <span className="font-medium">{userStats.orderCount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total spent</span>
+                  <span className="font-medium">{formatCurrency(userStats.totalSpent)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status</span>
@@ -354,6 +412,51 @@ const ProfilePage = () => {
                 </div>
               </div>
             </div>
+
+            {/* Recent Orders Preview */}
+            {userStats.orderCount > 0 ? (
+              <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Activity</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                      <FaShoppingBag className="text-white text-sm" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{userStats.orderCount} orders placed</p>
+                      <p className="text-xs text-gray-600">Total: {formatCurrency(userStats.totalSpent)}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate("/orders")}
+                    className="w-full text-center text-primary hover:text-primary/80 text-sm font-medium py-2"
+                  >
+                    View order history →
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Get Started</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                      <FaShoppingBag className="text-white text-sm" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">No orders yet</p>
+                      <p className="text-xs text-gray-600">Start your first order today!</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate("/menu")}
+                    className="w-full text-center text-primary hover:text-primary/80 text-sm font-medium py-2"
+                  >
+                    Browse menu →
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="bg-gradient-to-r from-primary to-blue-600 rounded-2xl p-6 text-white">
               <h3 className="font-semibold text-lg mb-2">🚚 Fast Delivery</h3>

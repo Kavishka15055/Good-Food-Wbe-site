@@ -2,13 +2,14 @@
 import React, { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { FaTrashAlt, FaPlus, FaMinus, FaArrowLeft, FaCreditCard } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import EmptyCart from "./EmptyCart"; // Import the EmptyCart component
+import { Link, useNavigate } from "react-router-dom";
+import EmptyCart from "./EmptyCart";
 import CartBG from "../../assets/cartBG.png";
 
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, addToCart } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const navigate = useNavigate();
 
   // Calculate totals
   const subtotal = cart.reduce((acc, item) => {
@@ -40,13 +41,25 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
-    setIsCheckingOut(true);
-    // Simulate checkout process
-    setTimeout(() => {
-      alert("🎉 Order placed successfully! Thank you for your purchase.");
-      clearCart();
-      setIsCheckingOut(false);
-    }, 2000);
+    // Get user data from localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    
+    if (!user) {
+      alert("Please login to proceed to checkout");
+      return;
+    }
+
+    // Check if user has delivery address
+    if (!user.address_line1) {
+      const proceed = confirm("You need to set a delivery address before checkout. Would you like to update your profile now?");
+      if (proceed) {
+        navigate("/profile");
+      }
+      return;
+    }
+
+    // Navigate to checkout page
+    navigate("/checkout");
   };
 
   // Return Empty Cart if no items
@@ -55,13 +68,13 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full py-0 pb-10 ">
-      <div className="container mx-auto px-2 ">
+    <div className="min-h-screen bg-gray-50 w-full py-0 pb-10">
+      <div className="container mx-auto px-2">
         {/* Header */}
         <div
-  className="text-center bg-blue-100 mb-12 pt-4 pb-4 mx-[-80px] sm:mx-[-130px] sm:h-[150px] h-[120px] bg-cover bg-center"
-  style={{ backgroundImage: `url(${CartBG})` }}
->
+          className="text-center bg-blue-100 mb-12 pt-4 pb-4 mx-[-80px] sm:mx-[-130px] sm:h-[150px] h-[120px] bg-cover bg-center"
+          style={{ backgroundImage: `url(${CartBG})` }}
+        >
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Your Cart</h1>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
             <span className="flex items-center gap-2">
@@ -73,10 +86,10 @@ const CartPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 ">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2 ">
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden ">
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="p-6 border-b border-gray-100">
                 <h2 className="text-xl font-semibold text-gray-800">Order Summary</h2>
               </div>
@@ -205,20 +218,10 @@ const CartPage = () => {
                 {/* Checkout Button */}
                 <button
                   onClick={handleCheckout}
-                  disabled={isCheckingOut}
-                  className="w-full bg-primary text-white py-4 rounded-xl font-semibold hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                  className="w-full bg-primary text-white py-4 rounded-xl font-semibold hover:bg-primary/90 transition duration-200 flex items-center justify-center gap-3"
                 >
-                  {isCheckingOut ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <FaCreditCard />
-                      Proceed to Checkout
-                    </>
-                  )}
+                  <FaCreditCard />
+                  Proceed to Checkout
                 </button>
 
                 {/* Security Badge */}
