@@ -6,6 +6,32 @@ const CartContext = createContext();
 export const CartProvider = ({ children, user }) => {
   const [cart, setCart] = useState([]);
 
+  // Helper function to parse price safely
+  const parsePrice = (priceStr) => {
+    if (!priceStr) return 0;
+    const cleaned = priceStr.toString().replace(/[^\d.]/g, "");
+    return parseFloat(cleaned) || 0;
+  };
+
+  // Calculate cart totals
+  const getCartTotals = () => {
+    const subtotal = cart.reduce((acc, item) => {
+      const price = parsePrice(item.price);
+      return acc + (price * item.quantity);
+    }, 0);
+
+    const tax = subtotal * 0.1; // 10% tax
+    const deliveryFee = subtotal > 1000 ? 0 : 100;
+    const total = subtotal + tax + deliveryFee;
+
+    return {
+      subtotal: subtotal.toFixed(2),
+      tax: tax.toFixed(2),
+      deliveryFee: deliveryFee.toFixed(2),
+      total: total.toFixed(2)
+    };
+  };
+
   // Load cart from backend when user logs in
   useEffect(() => {
     if (user?.id) {
@@ -195,18 +221,92 @@ export const CartProvider = ({ children, user }) => {
 
       if (res.ok && data.success) {
         setCart([]);
-        alert("✅ Cart cleared!");
+        console.log("✅ Cart cleared!");
       } else {
         alert(`❌ Failed to clear cart: ${data.message}`);
       }
     } catch (err) {
       console.error("❌ Error clearing cart:", err);
-      alert("❌ Error clearing cart: " + err.message);
+      // Still clear local cart even if backend fails
+      setCart([]);
     }
   };
 
+  // Remove item completely from cart (not just decrease quantity)
+  const removeItemCompletely = async (productId) => {
+    if (!user) return;
+
+    console.log("🛒 Removing item completely with ID:", productId);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/cart/remove-completely", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          productId: productId,
+        }),
+      });
+
+      const contentType = res.headers.get("content-type");
+      let data;
+      
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        console.error("❌ Server returned non-JSON response:", text.substring(0, 200));
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
+      }
+
+      console.log("🛒 Remove completely response:", data);
+
+      if (res.ok && data.success) {
+        setCart(prevCart => prevCart.filter(item => 
+          !(item.product_id === productId || item.id === productId)
+        ));
+      } else {
+        // If the specific endpoint doesn't exist, use the regular remove multiple times
+        // This is a fallback - you might want to implement the remove-completely endpoint
+        const item = cart.find(item => item.product_id === productId || item.id === productId);
+        if (item) {
+          for (let i = 0; i < item.quantity; i++) {
+            await removeFromCart(productId);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("❌ Error removing item completely:", err);
+      // Fallback: remove from local state
+      setCart(prevCart => prevCart.filter(item => 
+        !(item.product_id === productId || item.id === productId)
+      ));
+    }
+  };
+
+  // Get item total price
+  const getItemTotal = (item) => {
+    const price = parsePrice(item.price);
+    return (price * item.quantity).toFixed(2);
+  };
+
+  // Get cart item count
+  const getCartItemCount = () => {
+    return cart.reduce((total, item) => total + item.quantity, 0);
+  };
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ 
+      cart, 
+      addToCart, 
+      removeFromCart, 
+      removeItemCompletely,
+      clearCart,
+      getCartTotals,
+      getItemTotal,
+      getCartItemCount,
+      parsePrice
+    }}>
       {children}
     </CartContext.Provider>
   );
