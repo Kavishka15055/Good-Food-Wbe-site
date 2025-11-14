@@ -70,8 +70,7 @@ const CheckoutPage = () => {
 
       console.log("📦 Sending order data:", orderData);
 
-      // Try the main order endpoint first
-      let res = await fetch("http://localhost:5000/api/orders", {
+      const res = await fetch("http://localhost:5000/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -79,7 +78,7 @@ const CheckoutPage = () => {
         body: JSON.stringify(orderData),
       });
 
-      let responseText = await res.text();
+      const responseText = await res.text();
       console.log("📦 Order response:", responseText);
 
       let result;
@@ -88,28 +87,6 @@ const CheckoutPage = () => {
       } catch (parseError) {
         console.error("❌ Failed to parse response:", parseError);
         throw new Error("Invalid response from server");
-      }
-
-      // If main endpoint fails, try simple endpoint
-      if (!res.ok) {
-        console.log("🔄 Trying simple order endpoint...");
-        res = await fetch("http://localhost:5000/api/orders/simple", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(orderData),
-        });
-
-        responseText = await res.text();
-        console.log("📦 Simple order response:", responseText);
-        
-        try {
-          result = JSON.parse(responseText);
-        } catch (parseError) {
-          console.error("❌ Failed to parse simple response:", parseError);
-          throw new Error("Invalid response from simple order endpoint");
-        }
       }
 
       if (res.ok && result.success) {
@@ -147,7 +124,7 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-20">
+    <div className="min-h-screen bg-gray-50 pt-5 pb-10 w-full">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
