@@ -259,7 +259,7 @@ const CartPage = () => {
               { id: 23, name: "Chocolate Brownie", price: "220.Rs", img: "/images/menu/recommended/chocolate-brownie.jpg" },
               { id: 24, name: "Ice Cream", price: "150.Rs", img: "/images/menu/recommended/ice-cream.jpg" }
             ].map((item) => (
-              <div key={item.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-200">
+              <div key={item.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-200 hover:shadow-xl hover:scale-105 transition-all duration-300">
                 <img
                   src={item.img}
                   alt={item.name}
