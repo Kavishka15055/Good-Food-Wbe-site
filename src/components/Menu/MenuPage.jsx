@@ -420,7 +420,7 @@ const MenuPage = () => {
           </div>
 
           {/* Category Navigation */}
-          <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+          <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar pl-1">
             {menuCategories.map(category => (
               <button
                 key={category.id}
