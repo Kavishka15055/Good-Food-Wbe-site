@@ -79,19 +79,16 @@ router.get("/:orderId", async (req, res) => {
   }
 });
 
-// Create new order - COMPLETELY FIXED VERSION
+// Create new order - SIMPLIFIED AND FIXED VERSION
 router.post("/", async (req, res) => {
-  console.log("📦 Received order creation request:", req.body);
+  console.log("📦 Received order creation request");
   
-  let connection;
   try {
     const { userId, items, totalAmount, deliveryAddress, paymentMethod } = req.body;
 
     console.log("📦 Creating new order for user:", userId);
-    console.log("🛒 Order items:", JSON.stringify(items, null, 2));
+    console.log("🛒 Order items count:", items.length);
     console.log("💰 Total amount:", totalAmount);
-    console.log("🏠 Delivery address:", deliveryAddress);
-    console.log("💳 Payment method:", paymentMethod);
 
     // Validate required fields
     if (!userId || !items || !totalAmount || !deliveryAddress || !paymentMethod) {
@@ -111,100 +108,8 @@ router.post("/", async (req, res) => {
     // Generate unique order number
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
-    // Get database connection
-    connection = await db.getConnection();
-    await connection.beginTransaction();
-
-    try {
-      // Create order
-      console.log("📝 Creating order in database...");
-      const [orderResult] = await connection.execute(
-        `INSERT INTO orders (user_id, order_number, total_amount, delivery_address, payment_method, status, payment_status) 
-         VALUES (?, ?, ?, ?, ?, 'confirmed', 'pending')`,
-        [userId, orderNumber, totalAmount, JSON.stringify(deliveryAddress), paymentMethod]
-      );
-
-      const orderId = orderResult.insertId;
-      console.log(`✅ Order created with ID: ${orderId}`);
-
-      // Insert order items
-      console.log("📦 Inserting order items...");
-      for (const item of items) {
-        const itemTotal = (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1);
-        
-        console.log(`📝 Adding item: ${item.name}, Price: ${item.price}, Quantity: ${item.quantity}, Total: ${itemTotal}`);
-        
-        await connection.execute(
-          `INSERT INTO order_items (order_id, product_id, product_name, product_price, quantity, item_total) 
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [orderId, item.id, item.name, item.price, item.quantity, itemTotal]
-        );
-        console.log(`✅ Added item: ${item.name} x${item.quantity}`);
-      }
-
-      // Clear user's cart after successful order
-      console.log("🗑️ Clearing user's cart...");
-      await connection.execute(
-        "DELETE FROM cart_items WHERE user_id = ?",
-        [userId]
-      );
-
-      await connection.commit();
-      console.log(`🎉 Order ${orderNumber} created successfully!`);
-      
-      res.json({ 
-        success: true, 
-        message: "Order created successfully",
-        orderId: orderId,
-        orderNumber: orderNumber
-      });
-
-    } catch (transactionError) {
-      await connection.rollback();
-      console.error("❌ Order creation transaction failed:", transactionError);
-      console.error("❌ Transaction error details:", transactionError.message);
-      console.error("❌ Transaction error code:", transactionError.code);
-      
-      let errorMessage = "Failed to create order";
-      
-      if (transactionError.code === 'ER_NO_REFERENCED_ROW_2') {
-        errorMessage = "Invalid user or product reference. Please check if products exist.";
-      } else if (transactionError.code === 'ER_NO_SUCH_TABLE') {
-        errorMessage = "Database tables missing. Please run the SQL setup script.";
-      } else if (transactionError.code === 'ER_BAD_NULL_ERROR') {
-        errorMessage = "Missing required data for order creation.";
-      }
-      
-      throw new Error(errorMessage);
-    }
-
-  } catch (err) {
-    console.error("❌ Create order error:", err);
-    console.error("❌ Error stack:", err.stack);
-    
-    res.status(500).json({ 
-      success: false,
-      message: err.message || "Internal Server Error",
-      error: err.toString()
-    });
-  } finally {
-    if (connection) {
-      connection.release();
-    }
-  }
-});
-
-// Simple order creation endpoint (fallback)
-router.post("/simple", async (req, res) => {
-  try {
-    const { userId, items, totalAmount, deliveryAddress, paymentMethod } = req.body;
-
-    console.log("📦 Using simple order creation for user:", userId);
-
-    // Generate unique order number
-    const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-
-    // Create order without transaction
+    // Create order
+    console.log("📝 Creating order in database...");
     const [orderResult] = await db.execute(
       `INSERT INTO orders (user_id, order_number, total_amount, delivery_address, payment_method, status, payment_status) 
        VALUES (?, ?, ?, ?, ?, 'confirmed', 'pending')`,
@@ -212,8 +117,10 @@ router.post("/simple", async (req, res) => {
     );
 
     const orderId = orderResult.insertId;
+    console.log(`✅ Order created with ID: ${orderId}`);
 
     // Insert order items
+    console.log("📦 Inserting order items...");
     for (const item of items) {
       const itemTotal = (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1);
       
@@ -222,11 +129,18 @@ router.post("/simple", async (req, res) => {
          VALUES (?, ?, ?, ?, ?, ?)`,
         [orderId, item.id, item.name, item.price, item.quantity, itemTotal]
       );
+      console.log(`✅ Added item: ${item.name} x${item.quantity}`);
     }
 
-    // Clear cart
-    await db.execute("DELETE FROM cart_items WHERE user_id = ?", [userId]);
+    // Clear user's cart after successful order
+    console.log("🗑️ Clearing user's cart...");
+    await db.execute(
+      "DELETE FROM cart_items WHERE user_id = ?",
+      [userId]
+    );
 
+    console.log(`🎉 Order ${orderNumber} created successfully!`);
+    
     res.json({ 
       success: true, 
       message: "Order created successfully",
@@ -235,10 +149,24 @@ router.post("/simple", async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Simple order creation error:", err);
+    console.error("❌ Create order error:", err);
+    
+    let errorMessage = "Failed to create order";
+    
+    if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+      errorMessage = "Invalid user or product reference. Please check if products exist.";
+    } else if (err.code === 'ER_NO_SUCH_TABLE') {
+      errorMessage = "Database tables missing. Please run the SQL setup script.";
+    } else if (err.code === 'ER_BAD_NULL_ERROR') {
+      errorMessage = "Missing required data for order creation.";
+    } else if (err.code === 'ER_TRUNCATED_WRONG_VALUE_FOR_FIELD') {
+      errorMessage = "Invalid data format for order creation.";
+    }
+    
     res.status(500).json({ 
       success: false,
-      message: "Failed to create order: " + err.message
+      message: errorMessage,
+      error: err.message
     });
   }
 });
@@ -262,6 +190,41 @@ router.put("/:orderId/status", async (req, res) => {
   } catch (err) {
     console.error("Update order status error:", err);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Add this route to your orderRoutes.js
+router.post("/clear-old", async (req, res) => {
+  try {
+    const { userId, olderThan } = req.body;
+    
+    console.log("🗑️ Clearing old orders for user:", userId);
+    console.log("📅 Older than:", olderThan);
+
+    // Delete orders older than specified date that are delivered or cancelled
+    const [result] = await db.execute(
+      `DELETE FROM orders 
+       WHERE user_id = ? 
+       AND created_at < ? 
+       AND status IN ('delivered', 'cancelled')`,
+      [userId, olderThan]
+    );
+
+    console.log(`✅ Cleared ${result.affectedRows} old orders`);
+
+    res.json({
+      success: true,
+      message: "Old orders cleared successfully",
+      clearedCount: result.affectedRows
+    });
+
+  } catch (err) {
+    console.error("❌ Clear old orders error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to clear old orders",
+      error: err.message
+    });
   }
 });
 
