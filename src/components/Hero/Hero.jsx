@@ -19,24 +19,26 @@ function Hero() {
 
                     {/* Text Section */}
                     <div
-                        className='space-y-6 text-dark order-2 sm:order-1 text-center sm:text-left'
+                        className='space-y-8 text-dark order-2 sm:order-1 text-left sm:text-left  w-[700px]'
                         data-aos="fade-up"
                     >
-                        <h1 className='text-3xl md:text-4xl lg:text-5xl font-bold leading-tight'>
-                            Fresh & Healthy Meal Plan <br />
-                            <span className='text-secondary text-4xl md:text-5xl'>Delivery</span>{" "}
-                            in Miami
+                        <h1 className='text-2xl md:text-4xl lg:text-5xl font-bold leading-tight '>
+                            Diverse Flavors, One Delivery.
+                        </h1>
+                        <h1 className='text-xl md:text-1xl lg:text-2xl font-bold leading-tight mt-[-35px]'>
+                            <span className='text-secondary text-2xl md:text-3xl'>Fresh meals</span>{" "}
+                            from our kitchen to your home
                         </h1>
 
-                        <p className='text-lg md:text-xl text-gray-700'>
-                            Delicious Meals Delivered to Your Door <br />
-                            From <span className='font-semibold'>$132.95</span> per week
+                        <p className='text-lg md:text-xl text-gray-700 mt-[-35px]'>
+                            Gourmet delivery experience <br />
+                            From <span className='font-semibold'>LKR 2,500</span>/week
                         </p>
 
-                        {/* Button */}
-                        <div data-aos="fade-up" data-aos-delay="500">
+                        {/* Button - Removed data-aos from wrapper div */}
+                        {/* <div>
                             <PrimaryButton />
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Image Section */}
