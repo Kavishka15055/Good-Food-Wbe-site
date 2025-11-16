@@ -19,7 +19,7 @@ function About({ HandlePopup }) {
             <div
                 id="about"
                 style={BgStyle}
-                className="py-1 pt-30  scroll-mt-[100px] flex items-center justify-center min-h-screen"
+                className="py-1 pt-25 scroll-mt-[100px] flex items-center justify-center min-h-screen "
             >
                 <div className="container relative z-10 p-5">
                     <h1
@@ -41,10 +41,10 @@ function About({ HandlePopup }) {
                         a family gathering, or a special celebration, we ensure a warm and welcoming atmosphere.
                         Our chefs craft each dish with love, blending traditional flavors with modern creativity
                         to satisfy every palate. Join us for an unforgettable dining experience where taste meets
-                        tradition, and every meal feels like home."
+                        tradition, and every meal feels like home.
                         <br />
                         <br />
-                        Let me know if you'd like any changes! 😊🍕
+                        Let me know if you'd like any changes!
                         <div className="pt-10 flex justify-center">
                             <button
                                 onClick={HandlePopup}
@@ -60,7 +60,7 @@ function About({ HandlePopup }) {
                 </div>
 
                 {/* wave vector */}
-                <div className="absolute top-0 right-0 w-full">
+                <div className="absolute top-0 right-0 w-full ">
                     <img src={assets.vector} alt="" className="mx-auto" />
                 </div>
             </div>

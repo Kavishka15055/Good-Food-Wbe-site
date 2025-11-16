@@ -125,16 +125,21 @@ function Signup() {
           />
 
           <p className="text-[13px] text-gray-700 mt-2 text-justify">
-            By clicking <span className="font-semibold">Join</span> I agree to the{" "}
-            <a href="#" className="text-primary underline">Hilton Honors Program Terms and Conditions</a>, 
-            and I agree to the collection, use, sharing and transfer of information as set out in the{" "}
-            <a href="#" className="text-primary underline">Hilton Global Privacy Statement</a>. 
-            I also agree to receive special offers and promotions from Hilton via email and direct mail. 
-            I understand that I can unsubscribe from offers and promotions by changing my subscription preferences in my Hilton Honors profile. 
-            California Consumers, learn about{" "}
+            By clicking <span className="font-semibold">Join</span> I agree to
+            the{" "}
             <a href="#" className="text-primary underline">
-              Hilton's collection and use of your personal information
-            </a>.
+              Good Food Restaurant Terms and Conditions
+            </a>
+            , and I agree to the collection, use, sharing and transfer of
+            information as set out in the{" "}
+            <a href="#" className="text-primary underline">
+              Good Food Privacy Policy
+            </a>
+            . I also agree to receive special offers, promotions, and updates
+            about new menu items from Good Food via email and SMS. I understand
+            that I can unsubscribe from marketing communications at any time by
+            updating my preferences in my account settings or by contacting
+            customer service.
           </p>
 
           <button
