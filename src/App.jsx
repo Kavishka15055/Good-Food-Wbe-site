@@ -15,6 +15,7 @@ import { CartProvider } from "./context/CartContext";
 import ProfilePage from "./components/Profile/ProfilePage";
 import OrdersPage from "./components/Orders/OrdersPage";
 import CheckoutPage from "./components/Checkout/CheckoutPage";
+import LocationMap from "./components/Location/LocationMap"; 
 
 function App() {
   const [showPopup, setShowPopup] = useState(false);
@@ -49,7 +50,7 @@ function App() {
                   <Hero />
                   <Banner />
                   <About HandlePopup={HandlePopup} />
-                  <Banner />
+                  <LocationMap />
                   <Contact />
                   <Popup
                     showPopup={showPopup}

@@ -13,8 +13,8 @@ const BgStyle = {
 
 function Hero() {
     return (
-        <div id='hero' style={BgStyle} className='relative z-[-1]'>
-            <div className='container mx-auto px-4 py-16 sm:py-20'>
+        <div id='hero' style={BgStyle} className='relative z-[-1]  mt-[-15px]'>
+            <div className='container mx-auto px-4 py-16 sm:py-10'>
                 <div className='grid grid-cols-1 sm:grid-cols-2 items-center gap-10'>
 
                     {/* Text Section */}

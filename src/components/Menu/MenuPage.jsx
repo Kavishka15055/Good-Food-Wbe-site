@@ -4,8 +4,6 @@ import { useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { 
   FaSearch, 
-  FaFilter, 
-  FaSortAmountDown, 
   FaHeart, 
   FaRegHeart,
   FaPlus,
@@ -15,7 +13,7 @@ import {
   FaLeaf,
   FaStar,
   FaClock,
-  FaInfoCircle
+  FaTimes
 } from "react-icons/fa";
 
 const MenuPage = () => {
@@ -30,11 +28,12 @@ const MenuPage = () => {
   const [favorites, setFavorites] = useState(new Set());
   const [quantities, setQuantities] = useState({});
   const categoryRefs = useRef({});
+  const observerRef = useRef(null);
 
   const menuCategories = [
     {
       id: "starters",
-      title: "Starters / Appetizers",
+      title: "Starters",
       icon: "",
       items: [
         { 
@@ -53,7 +52,7 @@ const MenuPage = () => {
           name: "Garlic Bread", 
           img: "/images/menu/starters/garlic-bread.jpg", 
           price: "450.Rs",
-          description: "Toasted bread with garlic butter and herbs                             .",
+          description: "Toasted bread with garlic butter and herbs.",
           prepTime: "10 min",
           spicy: false,
           vegetarian: true
@@ -280,33 +279,108 @@ const MenuPage = () => {
     if (location.hash) {
       const section = document.querySelector(location.hash);
       if (section) {
-        section.scrollIntoView({ behavior: "smooth" });
+        const isMobile = window.innerWidth < 768;
+        const offset = isMobile ? 160 : 120;
+        const elementPosition = section.offsetTop - offset;
+        
+        window.scrollTo({
+          top: elementPosition,
+          behavior: "smooth"
+        });
         setActiveCategory(location.hash.replace('#', ''));
       }
     } else {
       window.scrollTo(0, 0);
     }
 
-    // Set up intersection observer for category highlighting
-    const observer = new IntersectionObserver(
+    // Cleanup previous observer
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    // Set up intersection observer for category highlighting with mobile-friendly settings
+    observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
             setActiveCategory(entry.target.id);
           }
         });
       },
-      { threshold: 0.5, rootMargin: "-100px 0px -50% 0px" }
+      { 
+        threshold: [0.1, 0.3, 0.5],
+        rootMargin: "-150px 0px -60% 0px"
+      }
     );
 
     // Observe all category sections
     menuCategories.forEach(category => {
       const element = document.getElementById(category.id);
-      if (element) observer.observe(element);
+      if (element) observerRef.current.observe(element);
     });
 
-    return () => observer.disconnect();
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
   }, [location]);
+
+  // Enhanced scroll function with mobile support
+  const scrollToCategory = (categoryId) => {
+    const element = document.getElementById(categoryId);
+    if (element) {
+      // Different offset for mobile vs desktop
+      const isMobile = window.innerWidth < 768;
+      const offset = isMobile ? 160 : 120;
+      
+      const elementPosition = element.offsetTop - offset;
+      window.scrollTo({
+        top: elementPosition,
+        behavior: "smooth"
+      });
+      
+      // Update active category immediately
+      setActiveCategory(categoryId);
+    }
+  };
+
+  // Handle scroll for manual category detection (fallback)
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 100;
+      let currentActive = activeCategory;
+
+      menuCategories.forEach(category => {
+        const element = document.getElementById(category.id);
+        if (element) {
+          const elementTop = element.offsetTop;
+          const elementHeight = element.offsetHeight;
+          const isMobile = window.innerWidth < 768;
+          const offset = isMobile ? 180 : 150;
+          
+          // Check if element is in viewport with offset
+          if (
+            scrollPosition >= elementTop - offset &&
+            scrollPosition < elementTop + elementHeight - offset
+          ) {
+            currentActive = category.id;
+          }
+        }
+      });
+
+      if (currentActive !== activeCategory) {
+        setActiveCategory(currentActive);
+      }
+    };
+
+    // Add scroll listener as fallback
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [activeCategory]);
 
   // Filter and sort items
   const filteredCategories = menuCategories.map(category => ({
@@ -368,29 +442,17 @@ const MenuPage = () => {
     });
   };
 
-  const scrollToCategory = (categoryId) => {
-    const element = document.getElementById(categoryId);
-    if (element) {
-      const offset = 100;
-      const elementPosition = element.offsetTop - offset;
-      window.scrollTo({
-        top: elementPosition,
-        behavior: "smooth"
-      });
-    }
-  };
-
   const getCartQuantity = (itemId) => {
     return cart.filter(item => item.id === itemId || item.product_id === itemId).length;
   };
 
   return (
     <div className="min-h-screen bg-gray-50 w-full">
-      {/* Sticky Header */}
-      <div className="fixed top-17 left-0 right-0 z-40 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4">
+      {/* Sticky Header - Increased top spacing for mobile */}
+      <div className="fixed top-14 sm:top-14 left-0 right-0 z-40 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200">
+        <div className="container mx-auto px-4 py-3 sm:py-5">
           {/* Search and Filters */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-4">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 mb-2">
             <div className="flex-1 relative">
               <FaSearch className="absolute left-3 top-3 text-gray-400" />
               <input
@@ -398,7 +460,7 @@ const MenuPage = () => {
                 placeholder="Search menu items..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
               />
             </div>
             
@@ -406,7 +468,7 @@ const MenuPage = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
               >
                 <option value="name">Sort by Name</option>
                 <option value="price-low">Price: Low to High</option>
@@ -419,19 +481,18 @@ const MenuPage = () => {
             </div>
           </div>
 
-          {/* Category Navigation */}
-          <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar pl-1">
+          {/* Category Navigation - Improved mobile styling */}
+          <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
             {menuCategories.map(category => (
               <button
                 key={category.id}
                 onClick={() => scrollToCategory(category.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200 ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200 flex-shrink-0 text-sm sm:text-base ${
                   activeCategory === category.id
                     ? "bg-primary text-white shadow-lg transform scale-105"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                <span className="text-lg">{category.icon}</span>
                 <span className="font-medium">{category.title.split(' ')[0]}</span>
               </button>
             ))}
@@ -439,10 +500,10 @@ const MenuPage = () => {
         </div>
       </div>
 
-      {/* Menu Content */}
-      <div className="container mx-auto py-15 px-4 w-full ">
+      {/* Menu Content - Adjusted top margin for mobile */}
+      <div className="container mx-auto py-4 px-4 w-full mt-28 sm:mt-24 mb-20">
         {filteredCategories.length === 0 ? (
-          <div className="text-center py-12 ">
+          <div className="text-center py-12">
             <FaSearch className="text-6xl text-gray-300 mx-auto mb-4" />
             <h2 className="text-2xl font-semibold text-gray-600 mb-2">No items found</h2>
             <p className="text-gray-500 mb-6">Try adjusting your search or filters</p>
@@ -462,16 +523,16 @@ const MenuPage = () => {
               key={category.id} 
               id={category.id}
               ref={el => categoryRefs.current[category.id] = el}
-              className={`mb-16 scroll-mt-24 ${index === 0 ? "pt-4" : "pt-8"}`}
+              className={`mb-16 scroll-mt-32 sm:scroll-mt-24 ${index === 0 ? "pt-4" : "pt-8"}`}
             >
               <div className="flex items-center gap-3 mb-8">
-                <h2 className="text-3xl font-bold text-gray-900">{category.title}</h2>
-                <span className="bg-primary text-white text-sm px-3 py-1 rounded-full">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">{category.title}</h2>
+                <span className="bg-primary text-white text-xs sm:text-sm px-3 py-1 rounded-full">
                   {category.items.length} items
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 {category.items.map((item) => {
                   const quantity = quantities[item.id] || 1;
                   const cartQuantity = getCartQuantity(item.id);
@@ -483,30 +544,29 @@ const MenuPage = () => {
                     >
                       {/* Item Image */}
                       <div 
-                        className="relative h-48 bg-cover bg-center cursor-pointer"
+                        className="relative h-40 sm:h-48 bg-cover bg-center cursor-pointer"
                         style={{ backgroundImage: `url(${item.img})` }}
-                        // onClick={() => handleQuickView(item)}
                       >
                         {/* Overlay */}
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition duration-300" />
                         
                         {/* Badges */}
-                        <div className="absolute top-3 left-3 flex gap-2">
+                        <div className="absolute top-2 left-2 flex gap-1 sm:gap-2">
                           {item.popular && (
                             <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                               <FaFire className="text-xs" />
-                              Popular
+                              <span className="hidden sm:inline">Popular</span>
                             </span>
                           )}
                           {item.vegetarian && (
                             <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                               <FaLeaf className="text-xs" />
-                              Veg
+                              <span className="hidden sm:inline">Veg</span>
                             </span>
                           )}
                           {item.spicy && (
                             <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
-                              🌶️ Spicy
+                              🌶️
                             </span>
                           )}
                         </div>
@@ -514,41 +574,33 @@ const MenuPage = () => {
                         {/* Favorite Button */}
                         <button
                           onClick={(e) => toggleFavorite(item.id, e)}
-                          className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 hover:scale-110 transition duration-200"
+                          className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-1 sm:p-2 hover:scale-110 transition duration-200"
                         >
                           {favorites.has(item.id) ? (
-                            <FaHeart className="text-red-500" />
+                            <FaHeart className="text-red-500 text-sm sm:text-base" />
                           ) : (
-                            <FaRegHeart className="text-gray-600" />
+                            <FaRegHeart className="text-gray-600 text-sm sm:text-base" />
                           )}
                         </button>
-
-                        {/* Quick View Button */}
-                        {/* <button
-                          onClick={() => handleQuickView(item)}
-                          className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition duration-200 hover:scale-110"
-                        >
-                          <FaInfoCircle className="text-gray-700" />
-                        </button> */}
                       </div>
 
                       {/* Item Details */}
-                      <div className="p-4 ">
+                      <div className="p-3 sm:p-4">
                         <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold text-lg text-gray-800 line-clamp-1 ">
+                          <h3 className="font-semibold text-base sm:text-lg text-gray-800 line-clamp-1">
                             {item.name}
                           </h3>
-                          <span className="text-primary font-bold text-lg">
+                          <span className="text-primary font-bold text-base sm:text-lg">
                             {item.price}
                           </span>
                         </div>
 
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2 h-10">
+                        <p className="text-gray-600 text-xs sm:text-sm mb-3 line-clamp-2 h-8 sm:h-10">
                           {item.description}
                         </p>
 
-                        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                          <div className="flex items-center gap-4">
+                        <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
+                          <div className="flex items-center gap-2 sm:gap-4">
                             <span className="flex items-center gap-1">
                               <FaClock className="text-xs" />
                               {item.prepTime}
@@ -566,15 +618,15 @@ const MenuPage = () => {
                         </div>
 
                         {/* Add to Cart Controls */}
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-1">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="flex items-center gap-1 sm:gap-2 bg-gray-100 rounded-lg px-2 sm:px-3 py-1">
                             <button
                               onClick={() => updateQuantity(item.id, -1)}
                               className="text-gray-600 hover:text-primary transition duration-200"
                             >
                               <FaMinus className="text-xs" />
                             </button>
-                            <span className="font-semibold text-sm w-6 text-center">
+                            <span className="font-semibold text-xs sm:text-sm w-4 sm:w-6 text-center">
                               {quantity}
                             </span>
                             <button
@@ -587,9 +639,9 @@ const MenuPage = () => {
 
                           <button
                             onClick={() => handleAddToCart(item, quantity)}
-                            className="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 flex items-center justify-center gap-2 font-semibold"
+                            className="flex-1 bg-primary text-white py-2 px-2 sm:px-4 rounded-lg hover:bg-primary/90 transition duration-200 flex items-center justify-center gap-1 sm:gap-2 font-semibold text-xs sm:text-sm"
                           >
-                            <FaShoppingCart />
+                            <FaShoppingCart className="text-xs sm:text-sm" />
                             Add to Cart
                           </button>
                         </div>
@@ -691,28 +743,6 @@ const MenuPage = () => {
           </div>
         </div>
       )}
-
-      {/* <style jsx>{`
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .line-clamp-1 {
-          overflow: hidden;
-          display: -webkit-box;
-          -webkit-line-clamp: 1;
-          -webkit-box-orient: vertical;
-        }
-        .line-clamp-2 {
-          overflow: hidden;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-        }
-      `}</style> */}
     </div>
   );
 };

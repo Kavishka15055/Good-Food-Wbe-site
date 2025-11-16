@@ -26,8 +26,8 @@ function Contact() {
                                     <IoLocationSharp className='text-5xl' />
                                 </div>
                                 <p>
-                                    #92,3rd Main, Virgo Nagar, Post,<br />
-                                    Seegehalli, Bengaluru, Karnataka 560049
+                                    #110, Y junction, Belihuloya,<br />
+                                    Sri Lanka
                                 </p>
                             </div>
 
