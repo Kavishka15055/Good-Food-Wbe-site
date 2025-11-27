@@ -114,12 +114,11 @@ Before running this project, make sure you have:
    Start backend server (Terminal 1)
    ```bash
    cd backend
-   npm start
+    node server.js
    ```
    Start frontend development server (Terminal 2)
    ```bash
-   cd frontend
-   npm start
+   npm run dev
    ```
 
 ---
