@@ -139,54 +139,6 @@ Before running this project, make sure you have:
 ---
 
 
-## 📁 Project Structure
-
-```
-good-food-restaurant/
-├── backend/
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── cartController.js
-│   │   ├── orderController.js
-│   │   └── profileController.js
-│   ├── routes/
-│   │   ├── authRoutes.js
-│   │   ├── cartRoutes.js
-│   │   ├── orderRoutes.js
-│   │   └── profileRoutes.js
-│   ├── db.js
-│   └── server.js
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Auth/
-│   │   │   │   ├── login.jsx
-│   │   │   │   └── signup.jsx
-│   │   │   ├── Menu/
-│   │   │   │   └── MenuPage.jsx
-│   │   │   ├── Cart/
-│   │   │   │   ├── CartPage.jsx
-│   │   │   │   └── EmptyCart.jsx
-│   │   │   ├── Profile/
-│   │   │   │   └── ProfilePage.jsx
-│   │   │   ├── Orders/
-│   │   │   │   └── OrdersPage.jsx
-│   │   │   ├── Checkout/
-│   │   │   │   └── CheckoutPage.jsx
-│   │   │   ├── Location/
-│   │   │   │   └── LocationMap.jsx
-│   │   │   └── Shared/
-│   │   │       └── PrimaryButton.jsx
-│   │   ├── context/
-│   │   │   └── CartContext.jsx
-│   │   ├── assets/
-│   │   └── App.jsx
-│   └── public/
-└── README.md
-```
-
----
-
 ## 🍽️ Menu Categories
 
 The application uses a custom authentication system with the following features:
