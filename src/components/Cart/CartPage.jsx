@@ -72,7 +72,7 @@ const CartPage = () => {
       <div className="container mx-auto px-2">
         {/* Header */}
         <div
-          className="text-center bg-blue-100 mb-12 pt-4 pb-4 mx-[-80px] sm:mx-[-130px] sm:h-[150px] h-[120px] bg-cover bg-center"
+          className="text-center mb-12 pt-4 pb-4 mx-[-80px] sm:mx-[-130px] sm:h-[150px] h-[120px] bg-cover bg-center"
           style={{ backgroundImage: `url(${CartBG})` }}
         >
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Your Cart</h1>

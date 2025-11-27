@@ -22,7 +22,7 @@ const MenuPage = () => {
   const [activeCategory, setActiveCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name");
-  const [priceRange, setPriceRange] = useState([0, 2000]);
+  const [priceRange, setPriceRange] = useState([0, 3000]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showQuickView, setShowQuickView] = useState(false);
   const [favorites, setFavorites] = useState(new Set());
@@ -40,7 +40,7 @@ const MenuPage = () => {
           id: 1, 
           name: "Spring Rolls", 
           img: "/images/menu/starters/spring-rolls.jpg", 
-          price: "550.Rs",
+          price: "900.Rs",
           description: "Crispy vegetable spring rolls with sweet chili sauce",
           prepTime: "15 min",
           spicy: false,
@@ -61,7 +61,7 @@ const MenuPage = () => {
           id: 3, 
           name: "Bruschetta", 
           img: "/images/menu/starters/Bruschetta.jpg", 
-          price: "450.Rs",
+          price: "750.Rs",
           description: "Toasted bread topped with fresh tomatoes and basil",
           prepTime: "12 min",
           spicy: false,
@@ -71,7 +71,7 @@ const MenuPage = () => {
           id: 4, 
           name: "Chicken Wings", 
           img: "/images/menu/starters/Chicken-Wings.jpg", 
-          price: "450.Rs",
+          price: "1350.Rs",
           description: "Crispy chicken wings with your choice of sauce",
           prepTime: "20 min",
           spicy: true,
@@ -89,7 +89,7 @@ const MenuPage = () => {
           id: 5, 
           name: "Tomato Basil Soup", 
           img: "/images/menu/soups/Tomato-Basil-Soup.jpg", 
-          price: "450.Rs",
+          price: "900.Rs",
           description: "Creamy tomato soup with fresh basil",
           prepTime: "15 min",
           spicy: false,
@@ -99,7 +99,7 @@ const MenuPage = () => {
           id: 6, 
           name: "Chicken Noodle Soup", 
           img: "/images/menu/soups/Chicken-Noodle-Soup.jpg", 
-          price: "450.Rs",
+          price: "950.Rs",
           description: "Chicken soup with vegetables and noodles",
           prepTime: "25 min",
           spicy: false,
@@ -109,7 +109,7 @@ const MenuPage = () => {
           id: 7, 
           name: "Cream of Mushroom", 
           img: "/images/menu/soups/Cream-of-Mushroom.jpg", 
-          price: "450.Rs",
+          price: "950.Rs",
           description: "Rich and creamy mushroom soup",
           prepTime: "18 min",
           spicy: false,
@@ -119,7 +119,7 @@ const MenuPage = () => {
           id: 8, 
           name: "Minestrone", 
           img: "/images/menu/soups/Minestrone.jpg", 
-          price: "450.Rs",
+          price: "950.Rs",
           description: "Traditional Italian vegetable soup",
           prepTime: "30 min",
           spicy: false,
@@ -137,7 +137,7 @@ const MenuPage = () => {
           id: 9, 
           name: "Caesar Salad", 
           img: "/images/menu/salads/Caesar-Salad.jpg", 
-          price: "450.Rs",
+          price: "1200.Rs",
           description: "Fresh romaine lettuce with Caesar dressing and croutons",
           prepTime: "10 min",
           spicy: false,
@@ -147,7 +147,7 @@ const MenuPage = () => {
           id: 10, 
           name: "Greek Salad", 
           img: "/images/menu/salads/Greek-Salad.jpg", 
-          price: "450.Rs",
+          price: "1450.Rs",
           description: "Mixed greens with feta, olives, and Greek dressing",
           prepTime: "12 min",
           spicy: false,
@@ -157,7 +157,7 @@ const MenuPage = () => {
           id: 11, 
           name: "Caprese Salad", 
           img: "/images/menu/salads/Caprese-Salad.jpg", 
-          price: "450.Rs",
+          price: "1700.Rs",
           description: "Fresh mozzarella, tomatoes, and basil with balsamic glaze",
           prepTime: "8 min",
           spicy: false,
@@ -168,7 +168,7 @@ const MenuPage = () => {
           id: 12, 
           name: "Garden Fresh Salad", 
           img: "/images/menu/salads/Garden-Fresh-Salad.jpg", 
-          price: "450.Rs",
+          price: "1200.Rs",
           description: "Mixed seasonal vegetables with house dressing",
           prepTime: "10 min",
           spicy: false,
@@ -185,7 +185,7 @@ const MenuPage = () => {
           id: 13, 
           name: "Grilled Chicken", 
           img: "/images/menu/main-course/Grilled-Chicken.jpg", 
-          price: "450.Rs",
+          price: "2400.Rs",
           description: "Juicy grilled chicken breast with herbs",
           prepTime: "25 min",
           spicy: false,
@@ -196,7 +196,7 @@ const MenuPage = () => {
           id: 14, 
           name: "Spaghetti Bolognese", 
           img: "/images/menu/main-course/Spaghetti-Bolognese.jpg", 
-          price: "450.Rs",
+          price: "1800.Rs",
           description: "Classic Italian pasta with meat sauce",
           prepTime: "20 min",
           spicy: false,
@@ -206,7 +206,7 @@ const MenuPage = () => {
           id: 15, 
           name: "Margherita Pizza", 
           img: "/images/menu/main-course/Margherita-Pizza.jpg", 
-          price: "450.Rs",
+          price: "1400.Rs",
           description: "Traditional pizza with tomato, mozzarella, and basil",
           prepTime: "15 min",
           spicy: false,
@@ -216,7 +216,7 @@ const MenuPage = () => {
           id: 16, 
           name: "Paneer Butter Masala", 
           img: "/images/menu/main-course/Paneer-Butter-Masala.jpg", 
-          price: "450.Rs",
+          price: "1800.Rs",
           description: "Indian cottage cheese in rich buttery tomato sauce",
           prepTime: "30 min",
           spicy: true,
@@ -234,7 +234,7 @@ const MenuPage = () => {
           id: 17, 
           name: "Classic Beef Burger", 
           img: "/images/menu/burgers-sandwiches/Classic-Beef-Burger.jpg", 
-          price: "450.Rs",
+          price: "1200.Rs",
           description: "Juicy beef patty with fresh vegetables and sauce",
           prepTime: "15 min",
           spicy: false,
@@ -245,7 +245,7 @@ const MenuPage = () => {
           id: 18, 
           name: "Veggie Burger", 
           img: "/images/menu/burgers-sandwiches/Veggie-Burger.jpg", 
-          price: "450.Rs",
+          price: "1300.Rs",
           description: "Plant-based patty with fresh toppings",
           prepTime: "12 min",
           spicy: false,
@@ -255,7 +255,7 @@ const MenuPage = () => {
           id: 19, 
           name: "Club Sandwich", 
           img: "/images/menu/burgers-sandwiches/Club-Sandwich.jpg", 
-          price: "450.Rs",
+          price: "1800.Rs",
           description: "Triple-decker sandwich with chicken, bacon, and vegetables",
           prepTime: "10 min",
           spicy: false,
@@ -265,7 +265,7 @@ const MenuPage = () => {
           id: 20, 
           name: "Chicken Panini", 
           img: "/images/menu/burgers-sandwiches/Chicken-Panini.jpg", 
-          price: "450.Rs",
+          price: "1700.Rs",
           description: "Grilled chicken panini with melted cheese",
           prepTime: "8 min",
           spicy: false,
@@ -482,7 +482,7 @@ const MenuPage = () => {
           </div>
 
           {/* Category Navigation - Improved mobile styling */}
-          <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+          <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar pt-1 pl-1">
             {menuCategories.map(category => (
               <button
                 key={category.id}
