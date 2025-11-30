@@ -57,7 +57,7 @@ function Contact() {
 
                         {/* Footer bottom */}
                         <div className='flex flex-col md:flex-row justify-between items-center text-sm p-4'>
-                            <p>@ 2022 TCJ. All rights reserved</p>
+                            <p>@ 2025 TCJ. All rights reserved</p>
                             <div className='flex gap-6 mt-2 md:mt-0'>
                                 <a href="#">Privacy Policy</a>
                                 <a href="#">Terms & Conditions</a>
