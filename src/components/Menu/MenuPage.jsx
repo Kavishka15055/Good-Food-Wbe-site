@@ -1,4 +1,4 @@
-// components/Menu/MenuPage.jsx
+
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";

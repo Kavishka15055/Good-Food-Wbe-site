@@ -18,7 +18,7 @@ export const restaurantConfig = {
     lng: 80.787876   // Your longitude
   },
   address: "#110, Y junction, Belihuloya, Sri Lanka",
-  phone: "+94 764325789", // Changed to Sri Lanka format
+  phone: "+94 764325789", 
   hours: "8:00 AM - 10:00 PM",
   zoomLevel: 15
 };

@@ -1,4 +1,4 @@
-// components/Checkout/CheckoutPage.jsx
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
@@ -10,10 +10,9 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("card");
   const navigate = useNavigate();
 
-  // Get user data from localStorage
+
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // Calculate totals with better price parsing
   const subtotal = cart.reduce((acc, item) => {
     const priceStr = item.price || "0";
     const cleaned = priceStr.replace(/[^\d.]/g, "");
@@ -41,7 +40,6 @@ const CheckoutPage = () => {
     setLoading(true);
 
     try {
-      // Prepare order data with proper price formatting
       const orderData = {
         userId: user.id,
         items: cart.map(item => {
@@ -290,7 +288,6 @@ const CheckoutPage = () => {
                   </div>
                 </div>
 
-                {/* Place Order Button */}
                 <button
                   onClick={handlePlaceOrder}
                   disabled={loading || !user?.address_line1}

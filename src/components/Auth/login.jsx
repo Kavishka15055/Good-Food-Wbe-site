@@ -26,12 +26,12 @@ function Popup({ showPopup, setShowPopup, setUser }) {
         alert("✅ Login successful!");
         // ✅ Store user with ID
         const user = {
-          id: data.user.id,        // <-- important
+          id: data.user.id,        
           firstName: data.user.firstName,
           email: data.user.email,
         };
         setUser(user);
-        localStorage.setItem("user", JSON.stringify(user)); // persist
+        localStorage.setItem("user", JSON.stringify(user)); 
         setShowPopup(true);
         navigate("/");
       } else {
@@ -94,4 +94,4 @@ function Popup({ showPopup, setShowPopup, setUser }) {
 
 export default Popup;
 
-//lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+

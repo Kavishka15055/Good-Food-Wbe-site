@@ -7,18 +7,11 @@ function Contact() {
     return (
         <>
             <div id="contact" className='text-white mt-20'>
-                {/* Full width pink background */}
                 <div className='w-[100%] mx-auto bg-gradient-to-b from-primary to-primaryDark rounded-t-3xl mr-150'>
-
-                    
-                    {/* Centered content inside full-width section */}
                     <div className='max-w-screen-xl mx-auto px-4'>
-                        {/* heading */}
                         <h1 className='py-10 text-3xl font-bold text-yellow text-center'>
                             Contact Us
                         </h1>
-
-                        {/* Contact grid */}
                         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-14 border-b-2 border-white pb-6'>
                             {/* Address */}
                             <div className='text-center space-y-4'>

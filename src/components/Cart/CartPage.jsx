@@ -19,7 +19,7 @@ const CartPage = () => {
   }, 0);
 
   const tax = subtotal * 0.1; // 10% tax
-  const deliveryFee = subtotal > 1000 ? 0 : 100; // Free delivery above 1000 Rs
+  const deliveryFee = subtotal > 1000 ? 0 : 100; 
   const total = subtotal + tax + deliveryFee;
 
   const handleIncreaseQuantity = (item) => {

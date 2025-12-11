@@ -46,7 +46,7 @@ function Signup() {
       if (res.ok) {
         alert("✅ Signup successful!");
         console.log("User created:", data);
-        window.location.href = "/"; // Redirect to login or home
+        window.location.href = "/"; 
       } else {
         alert("❌ " + data.message);
       }

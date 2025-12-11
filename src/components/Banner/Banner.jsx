@@ -34,7 +34,6 @@ function Banner() {
                             means you can enjoy our meals guilt-free, knowing they are made with the 
                             best ingredients and utmost care.
                         </div>
-                        {/* Optional image or blank column for layout */}
                         <div className='hidden sm:block'></div>
                     </div>
 
