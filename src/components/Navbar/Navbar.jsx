@@ -170,10 +170,13 @@ function Navbar({ HandlePopup, user, handleLogout }) {
     <div className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
       scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-white shadow-md'
     }`}>
-      <div className="container mx-auto flex justify-between items-center py-3 px-5">
+      <div className="container mx-auto flex justify-between items-center py-3 px-1 ">
         {/* Logo */}
+        <div className=" -mr-[60px] sm:-mr-[250px] md:-mr-[20px] lg:-mr-[450px]">
+          <img src="/logo.png" alt="Good Food Logo" className="w-12 h-12 object-contain rounded-full"/>
+        </div>
         <div 
-          className="font-bold text-2xl sm:text-3xl text-primary cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95"
+          className="font-bold text-xl sm:text-3xl md:text-2xl lg:text-3xl text-primary cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 "
           onClick={() => navigate("/")}
         >
           Good Food

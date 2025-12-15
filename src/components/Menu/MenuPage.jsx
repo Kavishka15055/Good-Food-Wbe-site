@@ -450,7 +450,7 @@ const MenuPage = () => {
     <div className="min-h-screen bg-gray-50 w-full">
       {/* Sticky Header - Increased top spacing for mobile */}
       <div className="fixed top-14 sm:top-14 left-0 right-0 z-40 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200">
-        <div className="container mx-auto px-4 py-3 sm:py-5">
+        <div className="container mx-auto px-4 pt-6 sm:pt-8">
           {/* Search and Filters */}
           <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 mb-2">
             <div className="flex-1 relative">
