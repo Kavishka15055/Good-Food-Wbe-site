@@ -21,7 +21,7 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         script: |
           if [ ! -d "restaurant-app" ]; then
-            git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git restaurant-app
+            git clone https://github.com/Kavishka15055/Good-Food-Wbe-site.git restaurant-app
           fi
           cd restaurant-app
           git pull
