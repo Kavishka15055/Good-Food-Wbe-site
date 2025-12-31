@@ -14,6 +14,10 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Routes - Make sure profileRoutes is registered
+app.get("/api/test", (req, res) => {
+  res.json({ message: "Backend is working!" });
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/profile", profileRoutes); 
